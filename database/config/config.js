@@ -1,13 +1,14 @@
 "use strict";
 const mysql2 = require("mysql2");
-const { DB_HOST, DB_USER, DB_PASS, DB_NAME } = process.env;
+require('dotenv').config();
+const { DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_DIALECT } = process.env;
 module.exports = {
   development: {
-    username: "root",
-    password: "",
-    database: "spk_rezi",
-    host: "localhost",
-    dialect: "mysql",
+    username: DB_USER,
+    password: DB_PASS,
+    database: DB_NAME,
+    host: DB_HOST,
+    dialect: DB_DIALECT,
     define: {
       timestamps: false,
     },
@@ -18,7 +19,7 @@ module.exports = {
     password: DB_PASS,
     database: DB_NAME,
     host: DB_HOST,
-    dialect: "mysql",
+    dialect: DB_DIALECT,
     logging: false,
     define: {
       timestamps: false,
@@ -30,7 +31,7 @@ module.exports = {
     password: DB_PASS,
     database: DB_NAME,
     host: DB_HOST,
-    dialect: "mysql",
+    dialect: DB_DIALECT,
     dialectOptions: {
       ssl: true,
     },

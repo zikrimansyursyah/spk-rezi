@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("Users", {
+    await queryInterface.createTable('Users', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -19,7 +19,11 @@ module.exports = {
         allowNull: false,
       },
       nisn: Sequelize.STRING,
-      no_induk_siswa: Sequelize.STRING,
+      no_induk_sekolah: Sequelize.STRING,
+      username: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
       password: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -40,6 +44,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("Users");
-  },
+    await queryInterface.dropTable('Users');
+  }
 };
