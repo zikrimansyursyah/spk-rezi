@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Kelas', {
+    await queryInterface.createTable("Kelas", {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -12,14 +12,18 @@ module.exports = {
       kelas_type: {
         type: Sequelize.INTEGER,
         allowNull: false,
+        references: {
+          model: "Enumeration",
+          key: "id",
+        },
       },
       nama_kelas: {
         type: Sequelize.STRING,
-        allowNull: false
-      }
+        allowNull: false,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Kelas');
-  }
+    await queryInterface.dropTable("Kelas");
+  },
 };

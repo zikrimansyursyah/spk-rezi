@@ -1,6 +1,6 @@
 "use strict";
 const mysql2 = require("mysql2");
-require('dotenv').config();
+require("dotenv").config();
 const { DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_DIALECT } = process.env;
 module.exports = {
   development: {
@@ -13,6 +13,7 @@ module.exports = {
       timestamps: false,
     },
     dialectModule: mysql2,
+    logging: false,
   },
   test: {
     username: DB_USER,
@@ -25,6 +26,7 @@ module.exports = {
       timestamps: false,
     },
     dialectModule: mysql2,
+    logging: false,
   },
   production: {
     username: DB_USER,
@@ -39,5 +41,6 @@ module.exports = {
       timestamps: false,
     },
     dialectModule: mysql2,
+    logging: false,
   },
 };

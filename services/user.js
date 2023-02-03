@@ -1,9 +1,6 @@
-import httpCall from "."
-import * as API from './constants.js';
-import { getCookies } from ".";
+import { httpCall } from "./index.js";
+import * as API from "./constants.js";
 
-export const getAllKaryawan = async (first = 0, rows = 10) => {
-  return await httpCall('POST', API.GET_ALL_USER, { first, rows }, {
-    'Authorize': 'Bearer ' + getCookies('access_token')
-  })
-}
+export const getAllUser = async (first = 0, rows = 10) => {
+  return await httpCall("post", API.USERS_GET_ALL, { first, rows });
+};
