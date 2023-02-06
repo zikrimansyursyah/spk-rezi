@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     });
   }
 
-  const { access_token } = req.body;
+  const { access_token } = req.headers;
 
   try {
     const verif = jwt.verify(access_token, process.env.JWT_SECRET_KEY);

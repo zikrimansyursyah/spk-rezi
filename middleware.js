@@ -9,12 +9,11 @@ export default async function middleware(req) {
   if (regexFile.test(url.pathname)) return NextResponse.next();
 
   if (access_token) {
-    let validateHeader = new Headers();
-    validateHeader.append("Content-Type", "application/json");
-    const validate = await fetch(url.origin + AUTH_VALIDATE, { method: "POST", body: JSON.stringify({ access_token }), headers: validateHeader })
+    const validate = await fetch(url.origin + AUTH_VALIDATE, { method: "POST", headers: { access_token } })
       .then((response) => response.json())
       .then((result) => result)
       .catch(() => ({ status: 500 }));
+
 
     const isValidate = validate?.status === 200;
     const userRole = validate?.user_type_name;
