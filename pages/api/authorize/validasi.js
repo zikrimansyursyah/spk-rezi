@@ -1,21 +1,20 @@
-import jwt from "jsonwebtoken";
-
-require("dotenv").config();
+import { API_UNAUTHORIZED } from "@/services/constants";
+import { verifyJWT } from "@/utils/jwt";
 
 export default async function handler(req, res) {
   if (req.method.toUpperCase() !== "POST") {
     return res.status(400).json({
-      status: 403,
+      status: 400,
       message: "Request Method Not Allowed",
     });
   }
 
   const { access_token } = req.headers;
 
-  try {
-    const verif = jwt.verify(access_token, process.env.JWT_SECRET_KEY);
+  const verif = verifyJWT(access_token);
+  if (verif) {
     return res.status(200).json({ status: 200, message: "Token Valid", data: verif });
-  } catch (error) {
-    return res.status(500).json({ status: 500, message: "Internal Server Error :" + error.message });
+  } else {
+    return res.status(API_UNAUTHORIZED.status).json(API_UNAUTHORIZED);
   }
 }

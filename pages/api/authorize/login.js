@@ -1,17 +1,14 @@
 import { authValidation } from "@/validation";
-import CryptoJS from "crypto-js";
-import db from "@/database/models";
-import jwt from "jsonwebtoken";
+import { signJWT } from "@/utils/jwt";
+import { decryptCrypto } from "@/utils/crypto";
+import { API_INTERNAL_SERVER_ERROR, API_METHOD_NOT_ALLOWED } from "@/services/constants";
 
-require("dotenv").config();
+const db = require("@/database/models");
 const Users = db.users;
 
-export default async function handler(req, res) {
+export default async function login(req, res) {
   if (req.method.toUpperCase() !== "POST") {
-    return res.status(400).json({
-      status: 403,
-      message: "Request Method Not Allowed",
-    });
+    return res.status(API_METHOD_NOT_ALLOWED.status).json(API_METHOD_NOT_ALLOWED);
   }
 
   const { value, error } = authValidation.loginSchema.validate(req.body);
@@ -60,16 +57,16 @@ export default async function handler(req, res) {
     }
 
     if (!user) {
-      return res.status(403).json({
-        status: 403,
+      return res.status(401).json({
+        status: 401,
         message: "Username tidak ditemukan",
       });
     }
 
-    const decryptPassword = CryptoJS.AES.decrypt(user.password, process.env.CRYPTO_SECRET_KEY).toString(CryptoJS.enc.Utf8);
+    const decryptPassword = decryptCrypto(user.password);
     if (decryptPassword !== password) {
-      return res.status(403).json({
-        status: 403,
+      return res.status(401).json({
+        status: 401,
         message: "Password tidak sesuai",
       });
     }
@@ -77,11 +74,10 @@ export default async function handler(req, res) {
     const userData = { ...user };
     delete userData.password;
 
-    const token = jwt.sign(userData, process.env.JWT_SECRET_KEY, { expiresIn: is_remember ? "168h" : "12h" });
+    const token = signJWT(userData, is_remember ? "168h" : "12h");
 
-    return res.status(200).json({ status: 200, message: "Login Berhasil", data: { token } });
+    return res.status(200).json({ status: 200, message: "Login Berhasil", data: { token, role: userData.user_type_name } });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ status: 500, message: "Internal Server Error" });
+    return res.status(API_INTERNAL_SERVER_ERROR.status).json(API_INTERNAL_SERVER_ERROR);
   }
 }
