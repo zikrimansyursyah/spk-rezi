@@ -1,5 +1,4 @@
 "use server";
-import axios from "axios";
 import { headers, cookies } from "next/headers";
 
 export function getCookies(name) {
@@ -23,31 +22,37 @@ export function getHeader(name) {
 
 export async function httpCall(method, url, data = null, headers = null) {
   const host = getHeader("host");
-  let result = null;
-
   let config = {
     method: method,
-    url: "http://" + host + url,
     headers: {
       "Content-Type": "application/json",
     },
   };
 
   if (data !== null) {
-    config.data = data;
+    config.body = JSON.stringify(data);
   }
 
   if (headers !== null) {
     config.headers = { ...config.headers, ...headers };
   }
 
-  await axios(config)
+  let api = {
+    status: 500,
+    message: null,
+  };
+
+  await fetch("http://" + host + url, config)
     .then((response) => {
-      result = response.data;
+      api.status = response.status;
+      return response.json();
+    })
+    .then((result) => {
+      api = { ...api, ...result };
     })
     .catch((error) => {
-      result = error.response;
+      api.message = error?.message;
     });
 
-  return result;
+  return api;
 }

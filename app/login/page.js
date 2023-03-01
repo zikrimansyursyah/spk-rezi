@@ -1,4 +1,3 @@
-import { TITLE_PAGE } from "@/services/constants";
 import Client from "./client";
 
 export default function Page() {
@@ -6,5 +5,5 @@ export default function Page() {
 }
 
 export const metadata = {
-  title: "Login" + TITLE_PAGE,
+  title: "Login",
 };

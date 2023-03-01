@@ -1,23 +1,20 @@
 import { NextResponse } from "next/server";
-import { AUTH_VALIDATE } from "./services/constants";
 import { decryptCrypto } from "./utils/crypto";
+import { verify } from "./utils/jwt";
 
 export default async function middleware(req) {
   const access_token = req.cookies.get("access_token")?.value;
   const url = req.nextUrl.clone();
 
   if (access_token) {
-    const validate = await fetch(url.origin + AUTH_VALIDATE, { method: "POST", headers: { access_token: decryptCrypto(access_token) } })
-      .then((response) => response.json())
-      .then((result) => result)
-      .catch(() => ({ status: 500 }));
-
-    const isValidate = validate?.status === 200;
+    const validate = await verify(decryptCrypto(access_token))
+      .then((data) => data)
+      .catch(() => null);
     const userRole = validate?.user_type_name;
 
     const acceptMenuSiswa = /(\/)|(\/penerima-bantuan)/g;
 
-    if (isValidate) {
+    if (validate !== null) {
       if (url.pathname === "/login") {
         url.pathname = "/";
         return NextResponse.redirect(url);

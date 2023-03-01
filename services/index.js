@@ -1,31 +1,35 @@
-import axios from "axios";
-
 export async function httpCall(method, url, data = null, headers = null) {
-  let result = null;
-
   let config = {
     method: method,
-    url: url,
     headers: {
       "Content-Type": "application/json",
     },
   };
 
   if (data !== null) {
-    config.data = data;
+    config.body = JSON.stringify(data);
   }
 
   if (headers !== null) {
     config.headers = { ...config.headers, ...headers };
   }
 
-  await axios(config)
+  let api = {
+    status: 500,
+    message: null,
+  };
+
+  await fetch(url, config)
     .then((response) => {
-      result = response.data;
+      api.status = response.status;
+      return response.json();
+    })
+    .then((result) => {
+      api = { ...api, ...result };
     })
     .catch((error) => {
-      result = error.response;
+      api.message = error?.message;
     });
 
-  return result;
+  return api;
 }

@@ -1,15 +1,13 @@
-import { JWT_SECRET_KEY } from "@/services/constants";
-import jwt from "jsonwebtoken";
+import { SignJWT, jwtVerify } from "jose";
 
-export function verifyJWT(value) {
-  try {
-    const result = jwt.verify(value, JWT_SECRET_KEY);
-    return result;
-  } catch (error) {
-    return null;
-  }
+export async function sign(token, isLongTime = false) {
+  const iat = Math.floor(Date.now() / 1000);
+  const exp = iat + 120 * (isLongTime ? 420 : 60);
+
+  return await new SignJWT(token).setProtectedHeader({ alg: "HS256", typ: "JWT" }).setExpirationTime(exp).setIssuedAt(iat).setNotBefore(iat).sign(new TextEncoder().encode(process.env.JWT_SECRET_KEY));
 }
 
-export function signJWT(value, expired = "12h") {
-  return jwt.sign(value, JWT_SECRET_KEY, { expiresIn: expired });
+export async function verify(token) {
+  const { payload } = await jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET_KEY));
+  return payload;
 }

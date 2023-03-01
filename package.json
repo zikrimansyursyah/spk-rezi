@@ -11,27 +11,21 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@next/font": "^13.2.1",
     "autoprefixer": "^10.4.13",
-    "axios": "^1.2.6",
-    "cookie": "^0.5.0",
+    "cookies-next": "^2.1.1",
     "crypto-js": "^4.1.1",
-    "dotenv": "^16.0.3",
     "formik": "^2.2.9",
-    "joi": "^17.7.0",
-    "js-cookie": "^3.0.1",
-    "jsonwebtoken": "^9.0.0",
-    "mysql2": "^3.1.0",
+    "jose": "^4.13.0",
+    "mysql2": "^3.1.2",
     "next": "^13.2.1",
     "postcss": "^8.4.21",
     "primeicons": "^6.0.1",
     "primereact": "^9.2.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "request": "^2.79.0",
-    "sequelize": "^6.28.0",
-    "tailwindcss": "^3.2.4",
-    "yup": "^1.0.1"
+    "sequelize": "^6.29.0",
+    "tailwindcss": "^3.2.7",
+    "yup": "^1.0.2"
   },
   "devDependencies": {
     "sequelize-cli": "^6.6.0"

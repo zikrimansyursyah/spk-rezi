@@ -1,10 +1,7 @@
 "use client";
-
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
-import * as yup from "yup";
-import * as menuUser from "@/services/menu";
 
 // Components
 import { InputText } from "primereact/inputtext";
@@ -17,16 +14,9 @@ import Image from "next/image";
 
 // Services
 import { login } from "@/services/user";
-import { httpCall } from "@/services";
-import { COOKIES } from "@/services/constants";
-import { encryptCrypto } from "@/utils/crypto";
 
-// Input Validation
-const validationSchema = yup.object().shape({
-  username: yup.string().min(4, "minimal 4 digit/karakter").required("masukan username/NIS anda"),
-  password: yup.string().min(5, "minimal 6 karakter").required("password harus diisi"),
-  is_remember: yup.boolean(),
-});
+// Validation
+import { loginSchema } from "@/validation/auth";
 
 export default function Client() {
   const router = useRouter();
@@ -36,36 +26,13 @@ export default function Client() {
   const handleLogin = () => {
     setLoading(true);
     login(formik.values)
-      .then(async (res) => {
+      .then((res) => {
         if (res.status !== 200) {
-          return toast.current.show({ severity: "warn", summary: "Gagal Login", detail: res.data.message });
+          return toast.current.show({ severity: "warn", summary: "Gagal Login", detail: res.message });
         }
         toast.current.show({ severity: "success", summary: "Login Berhasil", detail: "Anda akan segera dialihkan ke halaman Dashboard" });
-
-        await httpCall(
-          "POST",
-          COOKIES,
-          JSON.stringify({
-            cookie_name: "access_token",
-            value: encryptCrypto(res.data.token),
-          })
-        );
-
-        const getMenuValue = {
-          admin: menuUser.ADMIN,
-          siswa: menuUser.SISWA,
-        };
-
-        await httpCall(
-          "POST",
-          COOKIES,
-          JSON.stringify({
-            cookie_name: "menu",
-            value: encryptCrypto(JSON.stringify(getMenuValue[res.data.role])),
-          })
-        );
-
-        router.refresh();
+        // COOKIES SUDAH DI SET DI BE
+        router.push("/");
       })
       .catch((err) => {
         toast.current.show({ severity: "error", summary: "Internal Server Error", detail: err?.message });
@@ -85,7 +52,7 @@ export default function Client() {
       password: "",
       is_remember: false,
     },
-    validationSchema: validationSchema,
+    validationSchema: loginSchema,
     onSubmit: () => handleLogin(),
   });
   return (
