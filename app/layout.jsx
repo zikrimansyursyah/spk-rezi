@@ -1,19 +1,29 @@
-import "primereact/resources/themes/lara-light-indigo/theme.css"; //theme
+import { headers } from "next/headers";
+import { Inter } from "next/font/google";
+
+import "primereact/resources/themes/lara-light-blue/theme.css"; //theme
 import "primereact/resources/primereact.min.css"; //core css
 import "primeicons/primeicons.css"; //icons
 import "./globals.css";
-import { Inter } from "next/font/google";
-const inter = Inter({ subsets: ["latin"] });
+import AppComponents from "./AppComponents";
+import LayoutDashboard from "./layoutDashboard";
 
-export default function RootLayout({ children }) {
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+
+export default async function RootLayout({ children }) {
+  const headersList = headers();
+
+  const access_token = headersList.get("access_token") ? JSON.parse(headersList.get("access_token")) : {};
+  const menu = headersList.get("menu") ? JSON.parse(headersList.get("menu")) : [];
+
   return (
     <html lang="en">
-      {/*
-        <head /> will contain the components returned by the nearest parent
-        head.js. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head
-      */}
       <head />
-      <body className={inter.className}>{children}</body>
+      <body className={`${inter.className} ${inter.variable}`}>
+        <AppComponents menu={menu} accessToken={access_token}>
+          <LayoutDashboard>{children}</LayoutDashboard>
+        </AppComponents>
+      </body>
     </html>
   );
 }
@@ -24,7 +34,7 @@ export const metadata = {
   referrer: "origin-when-cross-origin",
   keywords: ["SPK", "Dana Kesejahteraan", "Skripsi"],
   authors: [{ name: "Rezi" }],
-  // themeColor: 'tomato',
+  // themeColor: 'dark',
   colorScheme: "light",
   creator: "Ahmad Fahrezi",
   publisher: "Ahmad Fahrezi",

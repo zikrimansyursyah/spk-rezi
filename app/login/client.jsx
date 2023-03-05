@@ -1,15 +1,13 @@
 "use client";
-import { useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useContext } from "react";
 import { useFormik } from "formik";
+import { AppContext } from "@/context";
 
 // Components
 import { InputText } from "primereact/inputtext";
-import { classNames } from "primereact/utils";
 import { Password } from "primereact/password";
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
-import { Toast } from "primereact/toast";
 import Image from "next/image";
 
 // Services
@@ -19,8 +17,7 @@ import { login } from "@/services/user";
 import { loginSchema } from "@/validation/auth";
 
 export default function Client() {
-  const router = useRouter();
-  const toast = useRef(null);
+  const { toast, classNames } = useContext(AppContext);
   const [loading, setLoading] = useState(false);
 
   const handleLogin = () => {
@@ -32,7 +29,8 @@ export default function Client() {
         }
         toast.current.show({ severity: "success", summary: "Login Berhasil", detail: "Anda akan segera dialihkan ke halaman Dashboard" });
         // COOKIES SUDAH DI SET DI BE
-        router.push("/");
+
+        window.location.reload();
       })
       .catch((err) => {
         toast.current.show({ severity: "error", summary: "Internal Server Error", detail: err?.message });
@@ -64,7 +62,7 @@ export default function Client() {
             <div className="relative w-16 h-16 -ml-4 lg:hidden">
               <Image src="/logo.png" alt="logo sekolah dasar" fill sizes="100%" className="object-contain" />
             </div>
-            <span className="text-lg font-semibold lg:hidden">SD Negeri Duri Kepa 01</span>
+            <span className="text-lg font-semibold lg:hidden">SD Negeri 02 Pakulonan Barat</span>
           </div>
           <form onSubmit={formik.handleSubmit} className="flex flex-col gap-3">
             <div className="mb-5">
@@ -78,6 +76,7 @@ export default function Client() {
               <InputText
                 id="username"
                 name="username"
+                placeholder="username atau NIS anda"
                 value={formik.values.username}
                 disabled={loading}
                 onChange={formik.handleChange}
@@ -92,6 +91,7 @@ export default function Client() {
               <Password
                 id="password"
                 name="password"
+                placeholder="password anda"
                 value={formik.values.password}
                 disabled={loading}
                 onChange={formik.handleChange}
@@ -112,7 +112,6 @@ export default function Client() {
           <footer className="text-sm">Copyright</footer>
         </div>
       </div>
-      <Toast ref={toast} />
     </div>
   );
 }

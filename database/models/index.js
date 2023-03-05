@@ -42,7 +42,9 @@ Object.keys(db).forEach((modelName) => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 db.users = require("./users.js")(sequelize, Sequelize);
-db.kelas = require("./kelas.js")(sequelize, Sequelize);
-db.enumeration = require("./enumeration.js")(sequelize, Sequelize);
+db.prestasi = require("./prestasi.js")(sequelize, Sequelize);
+db.absensi = require("./absensi.js")(sequelize, Sequelize);
+db.bobot = require("./bobot.js")(sequelize, Sequelize);
+db.bobot_nilai = require("./bobot_nilai.js")(sequelize, Sequelize);
 
 module.exports = db;

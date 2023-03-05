@@ -1,26 +1,34 @@
-'use strict';
+"use strict";
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Enumeration', {
+    await queryInterface.createTable("Bobot", {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false,
       },
-      name: {
+      kode: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      alt_name: Sequelize.STRING,
-      code: {
+      nama_kriteria: {
         type: Sequelize.STRING,
-        allowNull: false
-      }
+        allowNull: false,
+      },
+      tipe_kriteria: {
+        type: Sequelize.ENUM,
+        allowNull: false,
+        values: ["benefit", "cost"],
+      },
+      bobot: {
+        type: Sequelize.DECIMAL,
+        allowNull: false,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Enumeration');
-  }
+    await queryInterface.dropTable("Bobot");
+  },
 };

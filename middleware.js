@@ -4,17 +4,25 @@ import { verify } from "./utils/jwt";
 
 export default async function middleware(req) {
   const access_token = req.cookies.get("access_token")?.value;
+  const menu = req.cookies.get("menu")?.value;
   const url = req.nextUrl.clone();
+  const headers = new Headers(req.headers);
 
-  if (access_token) {
+  if (access_token && menu) {
     const validate = await verify(decryptCrypto(access_token))
       .then((data) => data)
       .catch(() => null);
+    const validateMenu = decryptCrypto(menu);
+
     const userRole = validate?.user_type_name;
 
     const acceptMenuSiswa = /(\/)|(\/penerima-bantuan)/g;
 
-    if (validate !== null) {
+    if (validate !== null && validateMenu !== "") {
+      // TER VALIDATE
+      headers.set("access_token", JSON.stringify(validate));
+      headers.set("menu", validateMenu);
+
       if (url.pathname === "/login") {
         url.pathname = "/";
         return NextResponse.redirect(url);
@@ -25,10 +33,10 @@ export default async function middleware(req) {
           url.pathname = "/";
           return NextResponse.redirect(url);
         }
-        return NextResponse.next();
+        return NextResponse.next({ request: { headers } });
       }
 
-      return NextResponse.next();
+      return NextResponse.next({ request: { headers } });
     } else {
       if (url.pathname !== "/login") {
         url.pathname = "/login";

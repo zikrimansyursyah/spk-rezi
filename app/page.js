@@ -1,14 +1,9 @@
 import Dashboard from "./Dashboard";
 
 export default function Home() {
-  return (
-    <>
-      <div>hallo</div>
-      <Dashboard />
-    </>
-  );
+  return <Dashboard />;
 }
 
 export const metadata = {
-  title: "Dashboard",
+  title: "Dashboard | SPK SDN 02 Duri Kepa",
 };

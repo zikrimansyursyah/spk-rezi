@@ -9,3 +9,4 @@ export const USERS_GET_ALL = "/api/user/get-all";
 export const RES_METHOD_NOT_ALLOWED = { status: 405, message: "Method Not Allowed" };
 export const RES_BAD_REQUEST = { status: 400, message: "BAD REQUEST" };
 export const RES_INTERNAL_SERVER_ERROR = { status: 500, message: "Internal Server Error" };
+export const RES_UNAUTHORIZE = { status: 401, message: "Unauthorize" };

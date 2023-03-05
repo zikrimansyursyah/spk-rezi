@@ -3,8 +3,9 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Users extends Model {
     static associate(models) {
-      Users.belongsTo(models.enumeration, { foreignKey: "user_type" });
-      Users.belongsTo(models.kelas, { as: "kelas", foreignKey: "id_kelas" });
+      // FK Here
+      Users.hasMany(models.prestasi);
+      Users.hasMany(models.absensi);
     }
   }
   Users.init(
@@ -16,16 +17,15 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       user_type: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      id_kelas: DataTypes.INTEGER,
-      nik: {
-        type: DataTypes.STRING(30),
+        type: DataTypes.ENUM("admin", "siswa"),
         allowNull: false,
       },
       nisn: DataTypes.STRING(20),
       no_induk_sekolah: DataTypes.STRING(20),
+      nama: {
+        type: DataTypes.STRING(255),
+        allowNull: false,
+      },
       username: {
         type: DataTypes.STRING(255),
         allowNull: false,
@@ -34,15 +34,50 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(1000),
         allowNull: false,
       },
-      nama: {
+      tempat_lahir: DataTypes.STRING(255),
+      tanggal_lahir: DataTypes.DATE,
+      jenis_kelamin: {
+        type: DataTypes.ENUM("laki-laki", "perempuan"),
+        allowNull: false,
+      },
+      alamat: DataTypes.STRING(1000),
+      no_telp: DataTypes.STRING(14),
+      status_tempat_tinggal: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+      },
+      is_ayah_bekerja: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+      },
+      nama_ayah: {
         type: DataTypes.STRING(255),
         allowNull: false,
       },
-      tempat_lahir: DataTypes.STRING(255),
-      tanggal_lahir: DataTypes.DATE,
-      jenis_kelamin: DataTypes.STRING(10),
-      alamat: DataTypes.STRING(1000),
-      no_telp: DataTypes.STRING(14),
+      jenis_pekerjaan_ayah: {
+        type: DataTypes.STRING(255),
+        allowNull: false,
+      },
+      pendapatan_perbulan_ayah: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      is_ibu_bekerja: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+      },
+      nama_ibu: {
+        type: DataTypes.STRING(255),
+        allowNull: false,
+      },
+      jenis_pekerjaan_ibu: {
+        type: DataTypes.STRING(255),
+        allowNull: false,
+      },
+      pendapatan_perbulan_ibu: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
       created_date: DataTypes.DATE,
       created_by: DataTypes.INTEGER,
       updated_date: DataTypes.DATE,
@@ -52,6 +87,7 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: "users",
       tableName: "users",
+      timestamps: false,
     }
   );
   return Users;

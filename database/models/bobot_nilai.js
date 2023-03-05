@@ -1,13 +1,13 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class Kelas extends Model {
+  class Bobot_Nilai extends Model {
     static associate(models) {
-      Kelas.belongsTo(models.enumeration, { as: "kelas_type", foreignKey: "kelas_type" });
-      Kelas.hasMany(models.users);
+      // FK Here
+      Bobot_Nilai.belongsTo(models.bobot, { foreignKey: "id_bobot" });
     }
   }
-  Kelas.init(
+  Bobot_Nilai.init(
     {
       id: {
         type: DataTypes.INTEGER,
@@ -15,20 +15,25 @@ module.exports = (sequelize, DataTypes) => {
         autoIncrement: true,
         allowNull: false,
       },
-      kelas_type: {
+      id_bobot: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      nama_kelas: {
-        type: DataTypes.STRING(25),
+      nama_nilai: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+      },
+      nilai: {
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
     },
     {
       sequelize,
-      modelName: "kelas",
-      tableName: "kelas",
+      modelName: "bobot_nilai",
+      tableName: "bobot_nilai",
+      timestamps: false,
     }
   );
-  return Kelas;
+  return Bobot_Nilai;
 };

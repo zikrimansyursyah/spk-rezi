@@ -3,7 +3,17 @@ export const ADMIN = [
     nama: "Dashboard",
     url: "/",
     icon: "pi-home",
-  }
+  },
+  {
+    nama: "Manajemen Siswa",
+    url: "/manajemen-siswa",
+    icon: "pi-home",
+  },
+  {
+    nama: "Penerima Bantuan",
+    url: "/penerima-bantuan",
+    icon: "pi-home",
+  },
 ];
 
 export const SISWA = [
@@ -12,4 +22,9 @@ export const SISWA = [
     url: "/",
     icon: "pi-home",
   },
-]
+  {
+    nama: "Penerima Bantuan",
+    url: "/penerima-bantuan",
+    icon: "pi-home",
+  },
+];

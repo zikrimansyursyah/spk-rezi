@@ -18,3 +18,15 @@ a {
  color: inherit;
  text-decoration: none;
 }
+
+.p-component {
+  font-family: var(--font-inter) !important
+}
+
+.td-h-center {
+  text-align: center !important;
+}
+
+.th-h-center > .p-column-header-content {
+  justify-content: center;
+}

@@ -1,11 +1,11 @@
 "use server";
 import { headers, cookies } from "next/headers";
 
-export function getCookies(name) {
+export async function getCookies(name) {
   return cookies().get(name)?.value;
 }
 
-export function getAllCookies() {
+export async function getAllCookies() {
   let result = {};
   cookies()
     .getAll()
@@ -16,7 +16,7 @@ export function getAllCookies() {
   return result;
 }
 
-export function getHeader(name) {
+export async function getHeader(name) {
   return headers().get(name);
 }
 

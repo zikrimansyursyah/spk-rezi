@@ -24,27 +24,7 @@ export default async function handler(req, res) {
   const { username, password, is_remember } = value;
 
   try {
-    const attributes = {
-      exclude: ["created_date", "created_by", "updated_date", "updated_by", "nik", "nisn", "tempat_lahir", "tanggal_lahir", "jenis_kelamin", "alamat", "no_telp"],
-      include: [
-        [
-          db.sequelize.literal(`(
-            SELECT a.name
-            FROM enumeration a
-            WHERE a.id = users.user_type
-          )`),
-          "user_type_name",
-        ],
-        [
-          db.sequelize.literal(`(
-            SELECT a.nama_kelas
-            FROM kelas a
-            WHERE a.id = users.id_kelas
-          )`),
-          "nama_kelas",
-        ],
-      ],
-    };
+    const attributes = ["id", "user_type", "nisn", "no_induk_sekolah", "nama", "username", "password"];
 
     let user = await Users.findOne({
       where: { username },
@@ -60,7 +40,7 @@ export default async function handler(req, res) {
     }
 
     if (!user) {
-      return res.status(401).json({ status: 401, message: "Username tidak ditemukan" });
+      return res.status(401).json({ status: 401, message: "Username / NIS tidak ditemukan" });
     }
 
     const decryptPassword = decryptCrypto(user.password);
@@ -78,7 +58,7 @@ export default async function handler(req, res) {
       ADMIN: menuUser.ADMIN,
       SISWA: menuUser.SISWA,
     };
-    const encryptMenu = encryptCrypto(JSON.stringify(menu[user.user_type_name.toUpperCase()]));
+    const encryptMenu = encryptCrypto(JSON.stringify(menu[user.user_type.toUpperCase()]));
 
     // SET COOKIES
     setCookie("access_token", encryptToken, { req, res, httpOnly: true, maxAge, secure: true });

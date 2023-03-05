@@ -1,8 +1,8 @@
 import { httpCall } from ".";
 import * as API from "./constants.js";
 
-export const getAllUser = async (first = 0, rows = 10) => {
-  return await httpCall("post", API.USERS_GET_ALL, { first, rows });
+export const getAllSiswa = async (first = 0, rows = 10, search) => {
+  return await httpCall("POST", API.USERS_GET_ALL, { first, rows, search });
 };
 
 export const login = async (data) => {
