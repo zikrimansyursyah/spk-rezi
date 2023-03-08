@@ -8,11 +8,12 @@ import Loading from "./loading";
 const DynamicUserTemplate = dynamic(() => import("./client"), { ssr: false, loading: () => <Loading /> });
 
 export default async function Page({ params }) {
+  let protocol = headers().get("referer").includes("https://") ? "https://" : "http://";
   let data = null;
   const { id } = params;
   await httpCall(
     "POST",
-    "http://" + (headers().get("host").includes("localhost") ? `127.0.0.1:${headers().get("host").split(":")[1]}` : headers().get("host")) + API.USERS_GET_DETAIL_SISWA,
+    protocol + (headers().get("host").includes("localhost") ? `127.0.0.1:${headers().get("host").split(":")[1]}` : headers().get("host")) + API.USERS_GET_DETAIL_SISWA,
     { id },
     { cookie: headers().get("cookie") }
   )
@@ -32,11 +33,12 @@ export default async function Page({ params }) {
 }
 
 export async function generateMetadata({ params }) {
+  let protocol = headers().get("referer").includes("https://") ? "https://" : "http://";
   let title = "Siswa";
   const { id } = params;
   await httpCall(
     "POST",
-    "http://" + (headers().get("host").includes("localhost") ? `127.0.0.1:${headers().get("host").split(":")[1]}` : headers().get("host")) + API.USERS_GET_NAMA_SISWA,
+    protocol + (headers().get("host").includes("localhost") ? `127.0.0.1:${headers().get("host").split(":")[1]}` : headers().get("host")) + API.USERS_GET_NAMA_SISWA,
     { id },
     { cookie: headers().get("cookie") }
   )
