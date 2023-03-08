@@ -8,6 +8,7 @@ import Loading from "./loading";
 const DynamicUserTemplate = dynamic(() => import("./client"), { ssr: false, loading: () => <Loading /> });
 
 export default async function Page({ params }) {
+  console.log(headers().get("host"));
   let data = null;
   const { id } = params;
   await httpCall("POST", "http://" + (headers().get("host").includes("localhost") ? "127.0.0.1:3000" : headers().get("host")) + API.USERS_GET_DETAIL_SISWA, { id }, { cookie: headers().get("cookie") })
