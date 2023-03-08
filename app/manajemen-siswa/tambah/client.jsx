@@ -90,7 +90,7 @@ export default function User() {
 
   return (
     <>
-      <div className="p-4 flex fixed w-full justify-between items-center bg-white border-b shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.02)]">
+      <div className="p-4 flex fixed w-full justify-between items-center bg-white border-b shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.02)] z-50">
         <div className="flex gap-3">
           <div className="w-1 h-12 bg-sky-500 rounded-full"></div>
           <div className="flex flex-col">

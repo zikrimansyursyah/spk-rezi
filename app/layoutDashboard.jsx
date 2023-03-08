@@ -93,7 +93,7 @@ export default function LayoutDashboard({ children }) {
             </button>
           </div>
         </div>
-        <div className="pt-[4.5rem] pb-4 min-h-screen bg-[#f7f7f8]">{children}</div>
+        <div className="pt-[4.5rem] min-h-screen bg-[#f7f7f8]">{children}</div>
       </div>
     );
   }

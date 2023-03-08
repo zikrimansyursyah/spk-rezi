@@ -8,6 +8,8 @@ import { Op } from "sequelize";
 
 const db = require("@/database/models");
 const Users = db.users;
+const Absensi = db.absensi;
+const Prestasi = db.prestasi;
 
 async function getAll(req, res) {
   if (req.method.toUpperCase() !== "POST") {
@@ -78,7 +80,7 @@ async function getDetailSiswa(req, res) {
     const password = decryptCrypto(user.password);
     delete user.password;
 
-    return res.status(200).json({ status: 200, message: "Berhasil Mendapatkan Nama User", data: { ...user, password } });
+    return res.status(200).json({ status: 200, message: "Berhasil Mendapatkan Data User", data: { ...user, password } });
   } catch (error) {
     return res.status(RES_INTERNAL_SERVER_ERROR.status).json(RES_INTERNAL_SERVER_ERROR);
   }
@@ -180,9 +182,11 @@ async function deleteSiswa(req, res) {
   const { id } = req.body;
 
   try {
+    await Absensi.destroy({ where: { id_siswa: id } });
+    await Prestasi.destroy({ where: { id_siswa: id } });
     await Users.destroy({ where: { id: id } });
 
-    return res.status(200).json({ status: 200, message: "Berhasil Merubah User" });
+    return res.status(200).json({ status: 200, message: "Berhasil Menghapus User" });
   } catch (error) {
     return res.status(RES_INTERNAL_SERVER_ERROR.status).json(RES_INTERNAL_SERVER_ERROR);
   }
