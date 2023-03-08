@@ -2,17 +2,20 @@
 
 import { useContext, useEffect, useState, useRef } from "react";
 import { AppContext } from "@/context";
-import { getAllSiswa } from "@/services/user";
+import { deleteSiswa, getAllSiswa } from "@/services/user";
+import { useRouter } from "next/navigation";
 
 // Components
-import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Menu } from "primereact/menu";
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import Link from "next/link";
 
 export default function ManajemenSiswa() {
-  const { toast } = useContext(AppContext);
+  const router = useRouter();
+  const { toast, loading } = useContext(AppContext);
   const menuAction = useRef(null);
 
   // Filter
@@ -31,7 +34,59 @@ export default function ManajemenSiswa() {
 
   const [selectedData, setSelectedData] = useState(null);
 
-  const actionMenu = [{ label: "Lihat", className: "text-sm" }, { label: "Ubah", className: "text-sm" }, { separator: true }, { label: "Hapus", className: "text-sm" }];
+  const actionMenu = [
+    {
+      template: () => {
+        return (
+          <Link href={`/manajemen-siswa/${selectedData?.id}`} className="p-menuitem-link">
+            <span className="p-menuitem-text text-sm">Lihat</span>
+          </Link>
+        );
+      },
+    },
+    {
+      template: () => {
+        return (
+          <Link href={`/manajemen-siswa/${selectedData?.id}?edit=true`} className="p-menuitem-link">
+            <span className="p-menuitem-text text-sm">Ubah</span>
+          </Link>
+        );
+      },
+    },
+    { separator: true },
+    {
+      label: "Hapus",
+      className: "text-sm",
+      command: () => {
+        confirmDialog({
+          message: "Anda yakin ingin menghapus " + selectedData.nama.split(" ")[0] + " ?",
+          header: "Hapus Siswa",
+          icon: "pi pi-exclamation-circle",
+          accept: () => {
+            loading({ text: "Kami sedang menghapus data " + selectedData.nama.split(" ")[0], visible: true });
+            deleteSiswa(selectedData.id)
+              .then((res) => {
+                if (res.status !== 200) {
+                  return toast.current.show({ severity: "warn", summary: "Gagal menghapus data siswa", detail: res.message });
+                }
+
+                toast.current.show({ severity: "success", summary: "Berhasil menghapus data siswa", detail: res.message });
+                return getDataSiswa();
+              })
+              .catch((error) => {
+                return toast.current.show({ severity: "error", summary: "Gagal menghapus data siswa", detail: error?.message });
+              })
+              .finally(() => {
+                loading({ text: null, visible: false });
+              });
+          },
+          reject: () => {
+            return;
+          },
+        });
+      },
+    },
+  ];
 
   const getDataSiswa = () => {
     setLoadingTable(true);
@@ -80,7 +135,7 @@ export default function ManajemenSiswa() {
 
   return (
     <div>
-      <div className="p-4 flex justify-between items-center bg-white border-b shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.02)]">
+      <div className="p-4 flex fixed w-full justify-between items-center bg-white border-b shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.02)]">
         <div className="flex gap-3">
           <div className="w-1 h-12 bg-sky-500 rounded-full"></div>
           <div className="flex flex-col">
@@ -88,14 +143,14 @@ export default function ManajemenSiswa() {
             <span className="text-sm text-gray-600">Mengelola data siswa di SD Negeri 02 Pakulonan Barat</span>
           </div>
         </div>
-        <div>
+        <Link href="/manajemen-siswa/tambah">
           <button className="flex items-center gap-3 bg-[#2293EE] py-2 px-4 rounded-lg hover:bg-[#4da5ed] active:scale-[0.97] focus:ring focus:ring-blue-200">
             <i className="pi pi-plus text-white text-xs font-semibold"></i>
             <span className="text-sm font-medium text-white">Tambah User</span>
           </button>
-        </div>
+        </Link>
       </div>
-      <div className="px-4 py-4">
+      <div className="px-4 pb-4 pt-24">
         <div className="bg-white w-full mt-1 rounded-lg border shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.001)] flex flex-col">
           <div className="py-2 px-4 flex items-center gap-2">
             <i className="pi pi-filter-fill text-[1rem] text-yellow-300"></i>
@@ -104,7 +159,7 @@ export default function ManajemenSiswa() {
           <span className="border-b"></span>
           <div className="py-4 px-4 flex justify-between items-center">
             <div>
-              <div className="flex flex-col gap-1">
+              {/* <div className="flex flex-col gap-1">
                 <label htmlFor="tipe-pengguna" className="text-sm">
                   Tipe Pengguna
                 </label>
@@ -118,7 +173,7 @@ export default function ManajemenSiswa() {
                   emptyMessage="Tidak ada data"
                   disabled={loadingTipeUser}
                 />
-              </div>
+              </div> */}
             </div>
             <div className="flex">
               <span className="p-input-icon-left">
@@ -148,6 +203,7 @@ export default function ManajemenSiswa() {
             first={lazyParams.first}
             value={dataUser}
             loading={loadingTable}
+            onPage={(e) => setLazyParams(e)}
             size="small"
             emptyMessage="Data tidak ditemukan"
             dataKey="id"
@@ -162,6 +218,7 @@ export default function ManajemenSiswa() {
           </DataTable>
         </div>
       </div>
+      <ConfirmDialog />
     </div>
   );
 }

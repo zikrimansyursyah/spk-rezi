@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { useRouter } from "next/navigation";
 import { AppContext } from "@/context";
 
 // Components
@@ -11,14 +10,13 @@ import Loading from "@/components/Loading";
 
 export default function AppComponents({ children, menu, accessToken }) {
   const toast = useRef(null);
-  const router = useRouter();
   const [loadingStatus, setLoadingStatus] = useState({
     visible: false,
     text: null,
   });
 
   return (
-    <AppContext.Provider value={{ toast: toast, router: router, menu: menu, access_token: accessToken, classNames: classNames, loading: setLoadingStatus }}>
+    <AppContext.Provider value={{ toast: toast, menu: menu, access_token: accessToken, classNames: classNames, loading: setLoadingStatus }}>
       {children}
       <Toast ref={toast} className="font-inter" />
       <Loading status={loadingStatus} />

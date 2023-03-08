@@ -10,6 +10,11 @@ export const ADMIN = [
     icon: "pi-home",
   },
   {
+    nama: "Absensi",
+    url: "/absensi",
+    icon: "pi-home",
+  },
+  {
     nama: "Penerima Bantuan",
     url: "/penerima-bantuan",
     icon: "pi-home",

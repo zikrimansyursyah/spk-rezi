@@ -25,7 +25,7 @@ export default function LayoutDashboard({ children }) {
       .catch(() => {});
   };
 
-  const accMenu = [{ label: "Profile", className: "text-sm" }, { separator: true }, { label: "Logout", className: "text-sm", icon: "pi pi-sign-out", command: handleLogout }];
+  const accMenu = [{ label: "Logout", className: "text-sm", icon: "pi pi-sign-out", command: handleLogout }];
 
   const renderMenu = () => {
     let data = menu || [];
@@ -37,7 +37,7 @@ export default function LayoutDashboard({ children }) {
             <div
               className={classNames({
                 "border px-6 py-2 rounded-xl hover:shadow-md hover:shadow-blue-100 hover:border-blue-300 active:scale-[0.95] active:ring active:ring-blue-200": true,
-                "bg-[#2293EE] font-medium border-[#2293EE] text-white": data[i].url === pathname,
+                "bg-[#2293EE] font-medium border-[#2293EE] text-white": pathname.includes(data[i].url),
               })}
             >
               {data[i].nama}
@@ -49,7 +49,7 @@ export default function LayoutDashboard({ children }) {
     return result;
   };
 
-  if (pathname === "/login") {
+  if (pathname === "/login" || !access_token) {
     return <>{children}</>;
   } else {
     return (
