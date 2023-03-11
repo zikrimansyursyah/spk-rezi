@@ -13,6 +13,7 @@ export default function LayoutDashboard({ children }) {
   const { classNames, menu, access_token, loading } = useContext(AppContext);
   const pathname = usePathname();
   const menuContent = useRef(null);
+  const menuNavbar = useRef(null);
 
   const handleLogout = () => {
     loading({ text: "Sedang proses logout..", visible: true });
@@ -32,18 +33,51 @@ export default function LayoutDashboard({ children }) {
     let result = [];
     for (let i = 0; i < data.length; i++) {
       if (data[i].nama.toUpperCase() !== "DASHBOARD") {
-        result.push(
-          <Link href={data[i].url} key={i}>
-            <div
-              className={classNames({
-                "border px-6 py-2 rounded-xl hover:shadow-md hover:shadow-blue-100 hover:border-blue-300 active:scale-[0.95] active:ring active:ring-blue-200": true,
-                "bg-[#2293EE] font-medium border-[#2293EE] text-white": pathname.includes(data[i].url),
-              })}
-            >
-              {data[i].nama}
-            </div>
-          </Link>
-        );
+        if (data[i].nama.toUpperCase() === "DATA PENDUKUNG") {
+          result.push(
+            <>
+              <Menu
+                model={data[i].list.map((v, index) => {
+                  return {
+                    template: () => {
+                      return (
+                        <Link key={index} href={v.url} className="p-menuitem-link">
+                          <span className="p-menuitem-text text-sm">{v.nama}</span>
+                        </Link>
+                      );
+                    },
+                  };
+                })}
+                popup
+                ref={menuNavbar}
+                className="mt-2"
+              />
+              <button
+                className={classNames({
+                  "flex items-center gap-2 border px-6 py-2 rounded-xl hover:shadow-md hover:shadow-blue-100 hover:border-blue-300 focus:ring focus:ring-blue-200 active:scale-[0.95] active:ring active:ring-blue-200": true,
+                  "bg-[#2293EE] font-medium border-[#2293EE] text-white": pathname.includes("absensi") || pathname.includes("prestasi"),
+                })}
+                onClick={(e) => menuNavbar.current.toggle(e)}
+              >
+                <span className="text-sm">Data Pendukung</span>
+                <i className="pi pi-chevron-down text-xs"></i>
+              </button>
+            </>
+          );
+        } else {
+          result.push(
+            <Link href={data[i].url} key={i}>
+              <div
+                className={classNames({
+                  "border px-6 py-2 rounded-xl text-sm hover:shadow-md hover:shadow-blue-100 hover:border-blue-300 active:scale-[0.95] active:ring active:ring-blue-200": true,
+                  "bg-[#2293EE] font-medium border-[#2293EE] text-white": pathname.includes(data[i].url),
+                })}
+              >
+                {data[i].nama}
+              </div>
+            </Link>
+          );
+        }
       }
     }
     return result;

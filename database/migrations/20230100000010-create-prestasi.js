@@ -26,6 +26,11 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      ranking: {
+        type: Sequelize.ENUM,
+        allowNull: false,
+        values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      },
       created_date: Sequelize.DATE,
       created_by: Sequelize.INTEGER,
       updated_date: Sequelize.DATE,

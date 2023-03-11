@@ -46,6 +46,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(100),
         allowNull: false,
       },
+      jumlah_saudara_kandung: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
       is_ayah_bekerja: {
         type: DataTypes.BOOLEAN,
         allowNull: false,

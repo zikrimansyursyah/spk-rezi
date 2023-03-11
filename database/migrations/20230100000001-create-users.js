@@ -41,6 +41,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      jumlah_saudara_kandung: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
       is_ayah_bekerja: {
         type: Sequelize,
         allowNull: false,
