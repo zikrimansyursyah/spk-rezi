@@ -5,5 +5,5 @@ export default function Home() {
 }
 
 export const metadata = {
-  title: "Dashboard | SPK SDN 02 Pakulonan Barat",
+  title: "Dashboard | SPK SDN Pakulonan Barat 02",
 };

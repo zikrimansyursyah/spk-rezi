@@ -3,7 +3,6 @@
 import { useContext, useEffect, useState, useRef } from "react";
 import { AppContext } from "@/context";
 import { deleteSiswa, getAllSiswa } from "@/services/user";
-import { useRouter } from "next/navigation";
 
 // Components
 import { InputText } from "primereact/inputtext";
@@ -14,14 +13,10 @@ import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import Link from "next/link";
 
 export default function ManajemenSiswa() {
-  const router = useRouter();
   const { toast, loading } = useContext(AppContext);
   const menuAction = useRef(null);
 
   // Filter
-  const [tipeUser, setTipeUser] = useState(null);
-  const [optionTipeUser, setOptionTipeUser] = useState([]);
-  const [loadingTipeUser, setLoadingTipeUser] = useState(true);
   const [search, setSearch] = useState("");
 
   // Table
@@ -146,7 +141,7 @@ export default function ManajemenSiswa() {
         <Link href="/manajemen-siswa/tambah">
           <button className="flex items-center gap-3 bg-[#2293EE] py-2 px-4 rounded-lg hover:bg-[#4da5ed] active:scale-[0.97] focus:ring focus:ring-blue-200">
             <i className="pi pi-plus text-white text-xs font-semibold"></i>
-            <span className="text-sm font-medium text-white">Tambah User</span>
+            <span className="text-sm font-medium text-white">Tambah Siswa</span>
           </button>
         </Link>
       </div>
@@ -159,21 +154,6 @@ export default function ManajemenSiswa() {
           <span className="border-b"></span>
           <div className="py-4 px-4 flex justify-between items-center">
             <div>
-              {/* <div className="flex flex-col gap-1">
-                <label htmlFor="tipe-pengguna" className="text-sm">
-                  Tipe Pengguna
-                </label>
-                <Dropdown
-                  id="tipe-pengguna"
-                  value={tipeUser}
-                  onChange={(e) => setTipeUser(e.value)}
-                  options={optionTipeUser}
-                  placeholder="Tipe pengguna"
-                  className="p-inputtext-sm"
-                  emptyMessage="Tidak ada data"
-                  disabled={loadingTipeUser}
-                />
-              </div> */}
             </div>
             <div className="flex">
               <span className="p-input-icon-left">

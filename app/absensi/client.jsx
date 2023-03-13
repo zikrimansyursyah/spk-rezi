@@ -4,7 +4,6 @@ import { AppContext } from "@/context";
 import { useContext, useEffect, useState, useRef } from "react";
 import { useFormik } from "formik";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 // Components
 import { InputText } from "primereact/inputtext";

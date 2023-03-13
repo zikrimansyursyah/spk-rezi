@@ -39,6 +39,12 @@ export default function User() {
             life: 3000,
           });
         } else {
+          toast.current.show({
+            severity: "success",
+            summary: "Berhasil menambah data",
+            detail: res.message,
+            life: 3000,
+          });
           return router.push("/manajemen-siswa");
         }
       })
@@ -63,6 +69,7 @@ export default function User() {
       alamat: "",
       no_telp: "",
       status_tempat_tinggal: null,
+      jumlah_saudara_kandung: 0,
       is_ayah_bekerja: 0,
       nama_ayah: "",
       jenis_pekerjaan_ayah: "",
@@ -215,23 +222,40 @@ export default function User() {
                   {getFormErrorMessage("jenis_kelamin")}
                 </div>
               </div>
-              <div className="col-span-1 flex flex-col gap-1">
-                <label htmlFor="status_tempat_tinggal" className="text-sm">
-                  Status Tempat Tinggal
-                </label>
-                <Dropdown
-                  inputId="status_tempat_tinggal"
-                  name="status_tempat_tinggal"
-                  placeholder="pilih status tempat tinggal"
-                  value={formik.values.status_tempat_tinggal}
-                  onChange={formik.handleChange}
-                  options={[
-                    { label: "Rumah Kontrak", value: "mengontrak" },
-                    { label: "Rumah Pribadi", value: "pribadi" },
-                  ]}
-                  className={classNames({ "p-inputtext-sm": true, "p-invalid": formik.touched["status_tempat_tinggal"] && formik.errors["status_tempat_tinggal"] })}
-                />
-                {getFormErrorMessage("status_tempat_tinggal")}
+              <div className="grid grid-cols-5 gap-4">
+                <div className="col-span-3 flex flex-col gap-1">
+                  <label htmlFor="status_tempat_tinggal" className="text-sm">
+                    Status Tempat Tinggal
+                  </label>
+                  <Dropdown
+                    inputId="status_tempat_tinggal"
+                    name="status_tempat_tinggal"
+                    placeholder="pilih status tempat tinggal"
+                    value={formik.values.status_tempat_tinggal}
+                    onChange={formik.handleChange}
+                    options={[
+                      { label: "Rumah Kontrak", value: "mengontrak" },
+                      { label: "Rumah Pribadi", value: "pribadi" },
+                    ]}
+                    className={classNames({ "p-inputtext-sm": true, "p-invalid": formik.touched["status_tempat_tinggal"] && formik.errors["status_tempat_tinggal"] })}
+                  />
+                  {getFormErrorMessage("status_tempat_tinggal")}
+                </div>
+                <div className="col-span-2 flex flex-col gap-1">
+                  <label htmlFor="jumlah_saudara_kandung" className="text-sm">
+                    Jumlah Saudara Kandung
+                  </label>
+                  <InputText
+                    id="jumlah_saudara_kandung"
+                    name="jumlah_saudara_kandung"
+                    placeholder="jumlah saudara kandung"
+                    keyfilter="int"
+                    value={formik.values.jumlah_saudara_kandung}
+                    onChange={formik.handleChange}
+                    className={classNames({ "p-inputtext-sm": true, "p-invalid": formik.touched["jumlah_saudara_kandung"] && formik.errors["jumlah_saudara_kandung"] })}
+                  />
+                  {getFormErrorMessage("jumlah_saudara_kandung")}
+                </div>
               </div>
               <div className="grid grid-cols-2 border-t pt-2 mt-2">
                 <div className="col-span-1 flex flex-col gap-3 border-r pr-4">
@@ -420,12 +444,12 @@ export default function User() {
               <div className="flex flex-col gap-2">
                 <div className="flex flex-col gap-1">
                   <label htmlFor="no_induk_sekolah" className="text-sm">
-                    Nomor Induk Siswa
+                    Nomor Induk Sekolah
                   </label>
                   <InputText
                     id="no_induk_sekolah"
                     name="no_induk_sekolah"
-                    placeholder="nomor induk siswa"
+                    placeholder="nomor induk sekolah"
                     keyfilter="int"
                     value={formik.values.no_induk_sekolah}
                     onChange={formik.handleChange}

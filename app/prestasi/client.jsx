@@ -3,10 +3,8 @@
 import { AppContext } from "@/context";
 import { useContext, useEffect, useState, useRef } from "react";
 import { useFormik } from "formik";
-import { useRouter } from "next/navigation";
 
 // Components
-import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -15,22 +13,19 @@ import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { Dialog } from "primereact/dialog";
 
 // Validation
-import { absensiSchema } from "@/validation/absensi";
 import { getDropdownSiswa } from "@/services/user";
-import { addAbsen, deleteAbsen, editAbsen, getAllAbsen } from "@/services/absensi";
+import { addPrestasi, deletePrestasi, editPrestasi, getPrestasi } from "@/services/prestasi";
+import { prestasiSchema } from "@/validation/prestasi";
 
 export default function Prestasi() {
-  const router = useRouter();
   const { classNames, loading, toast } = useContext(AppContext);
   const menuAction = useRef(null);
 
-  const optionBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-
   // Table
-  const [bulan, setBulan] = useState(optionBulan[new Date().getMonth()]);
-  const [tahun, setTahun] = useState(new Date().getFullYear().toString());
+  const [semester, setSemester] = useState("all");
+  const [tahunAjaran, setTahunAjaran] = useState(`${(new Date().getFullYear() - 1).toString()}/${new Date().getFullYear().toString()}`);
   const [loadingTable, setLoadingTable] = useState(true);
-  const [dataAbsensi, setDataAbsensi] = useState([]);
+  const [dataPrestasi, setDataPrestasi] = useState([]);
   const [lazyParams, setLazyParams] = useState({
     first: 0,
     rows: 10,
@@ -46,19 +41,19 @@ export default function Prestasi() {
   const [selectedData, setSelectedData] = useState(null);
 
   // Options
-  const getTahun = () => {
-    let first = new Date().getFullYear() - 10;
-    let last = new Date().getFullYear() + 10;
+  const getTahunAjaran = () => {
+    let first = new Date().getFullYear() - 5;
+    let last = new Date().getFullYear() + 5;
 
     let result = [];
     for (let i = first; i < last; i++) {
-      result.push(`${i}`);
+      result.push(`${i}/${i + 1}`);
     }
 
     return result;
   };
 
-  const optionTahun = getTahun();
+  const optionTahunAjaran = getTahunAjaran();
 
   const actionMenu = [
     {
@@ -73,6 +68,7 @@ export default function Prestasi() {
         delete params.id;
         delete params.no;
         delete params.no_induk_sekolah;
+        delete params.prestasi;
         formik.setValues(params);
       },
     },
@@ -82,23 +78,20 @@ export default function Prestasi() {
       className: "text-sm",
       command: () => {
         confirmDialog({
-          message: "Anda yakin ingin menghapus Absen " + selectedData.nama.split(" ")[0] + " ?",
-          header: "Hapus Data Absen",
+          message: "Anda yakin ingin menghapus data Prestasi " + selectedData.nama.split(" ")[0] + " ?",
+          header: "Hapus Data Prestasi",
           icon: "pi pi-exclamation-circle",
           accept: () => {
             loading({ text: "Kami sedang menghapus data Absen " + selectedData.nama.split(" ")[0], visible: true });
-            deleteAbsen(selectedData.id)
+            deletePrestasi(selectedData.id)
               .then((res) => {
-                if (res.status !== 200) {
-                  return toast.current.show({ severity: "warn", summary: "Gagal menghapus data absen", detail: res.message });
+                toast.current.show({ severity: res.status === 200 ? "success" : "warn", summary: res.status === 200 ? "Berhasil" : "Gagal", detail: res?.message });
+                if (res.status === 200) {
+                  getDataPrestasi();
                 }
-
-                toast.current.show({ severity: "success", summary: "Berhasil menghapus data absen", detail: res.message });
-                return getDataAbsensi();
+                return;
               })
-              .finally(() => {
-                loading({ text: null, visible: false });
-              });
+              .finally(() => loading({ text: null, visible: false }));
           },
           reject: () => {
             return;
@@ -108,9 +101,9 @@ export default function Prestasi() {
     },
   ];
 
-  const getDataAbsensi = () => {
+  const getDataPrestasi = () => {
     setLoadingTable(true);
-    getAllAbsen({ first: lazyParams.first, rows: lazyParams.rows, bulan, tahun })
+    getPrestasi({ first: lazyParams.first, rows: lazyParams.rows, semester, tahun_ajaran: tahunAjaran })
       .then((res) => {
         if (res.status !== 200) {
           return toast.current.show({ severity: "warn", summary: "Gagal", detail: res?.message });
@@ -120,28 +113,25 @@ export default function Prestasi() {
         for (let i = 0; i < res.data.length; i++) {
           dataTemp.push({
             ...res.data[i],
+            prestasi: res.data[i].ranking,
             no: lazyParams.first + i + 1,
           });
         }
-        setDataAbsensi(dataTemp);
+        setDataPrestasi(dataTemp);
       })
       .finally(() => setLoadingTable(false));
   };
 
   const handleAdd = (values) => {
-    if (Number(formik.values.jumlah_pertemuan) - (Number(formik.values.hadir) + Number(formik.values.izin) + Number(formik.values.sakit) + Number(formik.values.alfa)) !== 0) {
-      return;
-    }
-
     if (tipeDialog === "tambah") {
-      loading({ text: "Kami sedang menambah absensi", visible: true });
-      addAbsen(values)
+      loading({ text: "Kami sedang menambah data prestasi", visible: true });
+      addPrestasi(values)
         .then((res) => {
           toast.current.show({ severity: res.status === 200 ? "success" : "warn", summary: res.status === 200 ? "Berhasil" : "Gagal", detail: res?.message });
           if (res.status === 200) {
             setVisibleDialogAdd(false);
             formik.resetForm();
-            getDataAbsensi();
+            getDataPrestasi();
           }
           return;
         })
@@ -149,14 +139,14 @@ export default function Prestasi() {
           loading({ text: null, visible: false });
         });
     } else if (tipeDialog === "ubah") {
-      loading({ text: "Kami sedang mengubah absensi", visible: true });
-      editAbsen(values)
+      loading({ text: "Kami sedang mengubah data prestasi", visible: true });
+      editPrestasi(values)
         .then((res) => {
           toast.current.show({ severity: res.status === 200 ? "success" : "warn", summary: res.status === 200 ? "Berhasil" : "Gagal", detail: res?.message });
           if (res.status === 200) {
             setVisibleDialogAdd(false);
             formik.resetForm();
-            getDataAbsensi();
+            getDataPrestasi();
           }
           return;
         })
@@ -186,15 +176,11 @@ export default function Prestasi() {
   const formik = useFormik({
     initialValues: {
       id_siswa: "",
-      bulan: "",
-      tahun: "",
-      hadir: 0,
-      izin: 0,
-      sakit: 0,
-      alfa: 0,
-      jumlah_pertemuan: "",
+      semester: "",
+      tahun_ajaran: "",
+      ranking: "",
     },
-    validationSchema: absensiSchema,
+    validationSchema: prestasiSchema,
     onSubmit: (values) => handleAdd(values),
   });
 
@@ -216,13 +202,17 @@ export default function Prestasi() {
     );
   };
 
+  const rankingBodyTemplate = (data) => {
+    return <span>{`Rangking kelas ke-${data.prestasi}`}</span>;
+  };
+
   const getFormErrorMessage = (name) => {
     return formik.touched[name] && formik.errors[name] && <small className="p-error">{formik.errors[name]}</small>;
   };
 
   useEffect(() => {
-    getDataAbsensi();
-  }, [lazyParams, bulan, tahun]);
+    getDataPrestasi();
+  }, [lazyParams, semester, tahunAjaran]);
 
   return (
     <>
@@ -234,7 +224,15 @@ export default function Prestasi() {
             <span className="text-sm text-gray-600">Data Prestasi Siswa</span>
           </div>
         </div>
-        <button type="submit" className="flex items-center gap-3 bg-[#2293EE] py-2 px-4 rounded-lg hover:bg-[#4da5ed] active:scale-[0.97] focus:ring focus:ring-blue-200">
+        <button
+          onClick={() => {
+            setTipeDialog("tambah");
+            setVisibleDialogAdd(true);
+            getListSiswa();
+          }}
+          type="submit"
+          className="flex items-center gap-3 bg-[#2293EE] py-2 px-4 rounded-lg hover:bg-[#4da5ed] active:scale-[0.97] focus:ring focus:ring-blue-200"
+        >
           <i className="pi pi-plus text-white text-xs font-medium"></i>
           <span className="text-sm font-medium text-white">Tambah Data Prestasi</span>
         </button>
@@ -248,33 +246,35 @@ export default function Prestasi() {
           <span className="border-b"></span>
           <div className="py-4 px-4 flex gap-4 items-center">
             <div className="flex flex-col gap-1">
-              <label htmlFor="bulan" className="text-sm">
-                Bulan
+              <label htmlFor="semester_filter" className="text-sm">
+                Semester
               </label>
               <Dropdown
-                id="bulan"
-                name="bulan"
-                value={bulan}
-                onChange={(e) => setBulan(e.target.value)}
-                options={optionBulan}
-                placeholder="bulan"
+                id="semester_filter"
+                name="semester_filter"
+                value={semester}
+                onChange={(e) => setSemester(e.target.value)}
+                options={[
+                  { label: "All", value: "all" },
+                  { label: "Ganjil", value: "ganjil" },
+                  { label: "Genap", value: "genap" },
+                ]}
+                placeholder="semester"
                 className="p-inputtext-sm w-48"
-                emptyMessage="Tidak ada data"
               />
             </div>
             <div className="flex flex-col gap-1">
-              <label htmlFor="tahun" className="text-sm">
-                Tahun
+              <label htmlFor="tahun_ajaran_filter" className="text-sm">
+                Tahun Ajaran
               </label>
               <Dropdown
-                id="tahun"
-                name="tahun"
-                value={tahun}
-                onChange={(e) => setTahun(e.target.value)}
-                options={optionTahun}
-                placeholder="tahun"
+                id="tahun_ajaran_filter"
+                name="tahun_ajaran_filter"
+                value={tahunAjaran}
+                onChange={(e) => setTahunAjaran(e.target.value)}
+                options={optionTahunAjaran}
+                placeholder="tahun ajaran"
                 className="p-inputtext-sm w-26"
-                emptyMessage="Tidak ada data"
               />
             </div>
           </div>
@@ -287,7 +287,7 @@ export default function Prestasi() {
             rowsPerPageOptions={[10, 25, 50]}
             rows={lazyParams.rows}
             first={lazyParams.first}
-            value={dataAbsensi}
+            value={dataPrestasi}
             loading={loadingTable}
             onPage={(e) => setLazyParams(e)}
             size="small"
@@ -297,18 +297,15 @@ export default function Prestasi() {
             <Column field="no" header="#" bodyClassName="td-h-center" headerClassName="th-h-center" />
             <Column field="no_induk_sekolah" header="Nomor Induk Sekolah" />
             <Column field="nama" header="Nama Siswa" />
-            <Column field="hadir" header="Hadir" />
-            <Column field="izin" header="Izin" />
-            <Column field="sakit" header="Sakit" />
-            <Column field="alfa" header="Alfa" />
-            <Column field="jumlah_pertemuan" header="Jumlah Pertemuan" />
+            <Column field="tahun_ajaran" header="Tahun Ajaran" />
+            <Column field="prestasi" header="Prestasi" body={rankingBodyTemplate} />
             <Column header="Actions" body={actionBodyTemplate} className="w-[5%]" bodyClassName="td-h-center" headerClassName="th-h-center" />
           </DataTable>
         </div>
         <ConfirmDialog />
       </div>
-      {/* <Dialog
-        header={tipeDialog === "tambah" ? "Tambah Absensi" : `Edit Absensi ${selectedData?.nama ? selectedData.nama.split(" ")[0] : ""}`}
+      <Dialog
+        header={tipeDialog === "tambah" ? "Tambah Data Prestasi" : `Ubah Data Prestasi`}
         dismissableMask
         visible={visibleDialogAdd}
         style={{ width: "40vw" }}
@@ -335,128 +332,56 @@ export default function Prestasi() {
             />
             {getFormErrorMessage("id_siswa")}
           </div>
-          <div className="grid grid-cols-5 gap-4">
-            <div className="col-span-3 flex flex-col gap-1">
-              <label htmlFor="bulan" className="text-sm">
-                Bulan
+          <div className="grid grid-cols-2 gap-4">
+            <div className="col-span-1 flex flex-col gap-1">
+              <label htmlFor="semester" className="text-sm">
+                Semester
               </label>
               <Dropdown
-                id="bulan"
-                name="bulan"
-                value={formik.values.bulan}
+                id="semester"
+                name="semester"
+                value={formik.values.semester}
                 onChange={formik.handleChange}
-                options={optionBulan}
-                placeholder="bulan"
-                className={classNames({ "p-inputtext-sm": true, "p-invalid": formik.touched["bulan"] && formik.errors["bulan"] })}
-                emptyMessage="Tidak ada data"
+                options={[
+                  { label: "Ganjil", value: "ganjil" },
+                  { label: "Genap", value: "genap" },
+                ]}
+                placeholder="semester"
+                className={classNames({ "p-inputtext-sm": true, "p-invalid": formik.touched["semester"] && formik.errors["semester"] })}
               />
-              {getFormErrorMessage("bulan")}
+              {getFormErrorMessage("semester")}
             </div>
-            <div className="col-span-2 flex flex-col gap-1">
-              <label htmlFor="tahun" className="text-sm">
-                Tahun
+            <div className="col-span-1 flex flex-col gap-1">
+              <label htmlFor="tahun_ajaran" className="text-sm">
+                Tahun Ajaran
               </label>
               <Dropdown
-                id="tahun"
-                name="tahun"
-                value={formik.values.tahun}
+                id="tahun_ajaran"
+                name="tahun_ajaran"
+                value={formik.values.tahun_ajaran}
                 onChange={formik.handleChange}
-                options={optionTahun}
-                placeholder="tahun"
-                className={classNames({ "p-inputtext-sm": true, "p-invalid": formik.touched["tahun"] && formik.errors["tahun"] })}
-                emptyMessage="Tidak ada data"
+                options={optionTahunAjaran}
+                placeholder="tahun ajaran"
+                className={classNames({ "p-inputtext-sm": true, "p-invalid": formik.touched["tahun_ajaran"] && formik.errors["tahun_ajaran"] })}
               />
-              {getFormErrorMessage("tahun")}
+              {getFormErrorMessage("tahun_ajaran")}
             </div>
           </div>
-          <p className="border-t pt-2 font-medium">Informasi Kehadiran</p>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="col-span-1 flex flex-col gap-1">
-              <label htmlFor="jumlah_pertemuan" className="text-sm">
-                Jumlah Pertemuan
-              </label>
-              <InputText
-                id="jumlah_pertemuan"
-                name="jumlah_pertemuan"
-                value={formik.values.jumlah_pertemuan}
-                onChange={formik.handleChange}
-                placeholder="jumlah pertemuan"
-                className={classNames({ "p-inputtext-sm": true, "p-invalid": formik.touched["jumlah_pertemuan"] && formik.errors["jumlah_pertemuan"] })}
-                keyfilter="int"
-              />
-              {getFormErrorMessage("jumlah_pertemuan")}
-            </div>
-            <div className="col-span-1">
-              <p className="text-xs text-right">
-                Sisa alokasi jumlah pertemuan <span className="text-xs font-semibold italic">(harus 0)</span>
-              </p>
-              <p className="text-right text-lg font-semibold">{formik.values.jumlah_pertemuan - formik.values.hadir - formik.values.izin - formik.values.sakit - formik.values.alfa}</p>
-              {formik.values.jumlah_pertemuan - formik.values.hadir - formik.values.izin - formik.values.sakit - formik.values.alfa < 0 && (
-                <p className="text-xs text-red-500 text-right">kehadiran melebihi jumlah pertemuan</p>
-              )}
-            </div>
-          </div>
-          <div className="grid grid-cols-4 gap-4">
-            <div className="col-span-1 flex flex-col gap-1">
-              <label htmlFor="hadir" className="text-sm">
-                Hadir
-              </label>
-              <InputText
-                id="hadir"
-                name="hadir"
-                value={formik.values.hadir}
-                onChange={formik.handleChange}
-                placeholder="hadir"
-                className={classNames({ "p-inputtext-sm": true, "p-invalid": formik.touched["hadir"] && formik.errors["hadir"] })}
-                keyfilter="int"
-              />
-              {getFormErrorMessage("hadir")}
-            </div>
-            <div className="col-span-1 flex flex-col gap-1">
-              <label htmlFor="izin" className="text-sm">
-                Izin
-              </label>
-              <InputText
-                id="izin"
-                name="izin"
-                value={formik.values.izin}
-                onChange={formik.handleChange}
-                placeholder="izin"
-                className={classNames({ "p-inputtext-sm": true, "p-invalid": formik.touched["izin"] && formik.errors["izin"] })}
-                keyfilter="int"
-              />
-              {getFormErrorMessage("izin")}
-            </div>
-            <div className="col-span-1 flex flex-col gap-1">
-              <label htmlFor="sakit" className="text-sm">
-                Sakit
-              </label>
-              <InputText
-                id="sakit"
-                name="sakit"
-                value={formik.values.sakit}
-                onChange={formik.handleChange}
-                placeholder="sakit"
-                className={classNames({ "p-inputtext-sm": true, "p-invalid": formik.touched["sakit"] && formik.errors["sakit"] })}
-                keyfilter="int"
-              />
-              {getFormErrorMessage("sakit")}
-            </div>
-            <div className="col-span-1 flex flex-col gap-1">
-              <label htmlFor="alfa" className="text-sm">
-                Alfa
-              </label>
-              <InputText
-                id="alfa"
-                name="alfa"
-                value={formik.values.alfa}
-                onChange={formik.handleChange}
-                placeholder="alfa"
-                className={classNames({ "p-inputtext-sm": true, "p-invalid": formik.touched["alfa"] && formik.errors["alfa"] })}
-                keyfilter="int"
-              />
-              {getFormErrorMessage("alfa")}
-            </div>
+          <div className="col-span-1 flex flex-col gap-1">
+            <label htmlFor="ranking" className="text-sm">
+              Ranking
+            </label>
+            <Dropdown
+              id="ranking"
+              name="ranking"
+              value={formik.values.ranking}
+              onChange={formik.handleChange}
+              options={[{ label: "1" }, { label: "2" }, { label: "3" }, { label: "4" }, { label: "5" }, { label: "6" }, { label: "7" }, { label: "8" }, { label: "9" }, { label: "10" }]}
+              placeholder="ranking"
+              optionValue="label"
+              className={classNames({ "p-inputtext-sm": true, "p-invalid": formik.touched["ranking"] && formik.errors["ranking"] })}
+            />
+            {getFormErrorMessage("ranking")}
           </div>
           <div className="grid grid-cols-2 gap-4 border-t pt-4">
             <button
@@ -477,7 +402,7 @@ export default function Prestasi() {
             </button>
           </div>
         </div>
-      </Dialog> */}
+      </Dialog>
     </>
   );
 }

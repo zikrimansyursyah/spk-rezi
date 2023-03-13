@@ -45,7 +45,7 @@ export const metadata = {
     telephone: false,
   },
   title: {
-    default: "SPK SDN 02 Pakulonan Barat",
-    template: "%s | SPK SDN 02 Pakulonan Barat",
+    default: "SPK SDN Pakulonan Barat 02",
+    template: "%s | SPK SDN Pakulonan Barat 02",
   },
 };

@@ -18,7 +18,7 @@ export default function Dashboard() {
             <div className="col-span-7 flex flex-col gap-4">
               <h1 className="text-6xl font-medium text-gray-800">Sistem Penunjang Keputusan</h1>
               <h2 className="text-2xl font-medium">Siswa Penerima Dana Bantuan Kesejahteraan</h2>
-              <h3>Sekolah Dasar Negeri 02 Pakulonan Barat</h3>
+              <h3>Sekolah Dasar Negeri Pakulonan Barat 02</h3>
             </div>
           </div>
           <div className="grid grid-cols-12 gap-4 mt-16">

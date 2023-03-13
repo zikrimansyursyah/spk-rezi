@@ -62,7 +62,7 @@ export default function Client() {
             <div className="relative w-16 h-16 -ml-4 lg:hidden">
               <Image src="/logo.png" alt="logo sekolah dasar" fill sizes="100%" className="object-contain" />
             </div>
-            <span className="text-lg font-semibold lg:hidden">SD Negeri 02 Pakulonan Barat</span>
+            <span className="text-lg font-semibold lg:hidden">SD Negeri Pakulonan Barat 02</span>
           </div>
           <form onSubmit={formik.handleSubmit} className="flex flex-col gap-3">
             <div className="mb-5">

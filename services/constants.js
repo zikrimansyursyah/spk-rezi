@@ -17,6 +17,12 @@ export const ABSENSI_EDIT = "/api/absensi/edit-absen";
 export const ABSENSI_GET_ALL = "/api/absensi/get-absen";
 export const ABSENSI_DELETE = "/api/absensi/hapus-absen";
 
+// PRESTASI
+export const PRESTASI_GET_ALL = "/api/prestasi/get-all";
+export const PRESTASI_TAMBAH = "/api/prestasi/add";
+export const PRESTASI_EDIT = "/api/prestasi/edit";
+export const PRESTASI_DELETE = "/api/prestasi/delete";
+
 // API RESPONSE
 export const RES_METHOD_NOT_ALLOWED = { status: 405, message: "Method Not Allowed" };
 export const RES_BAD_REQUEST = { status: 400, message: "BAD REQUEST" };

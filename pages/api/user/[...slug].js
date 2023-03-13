@@ -32,8 +32,8 @@ async function getAll(req, res) {
       offset: first,
       limit: rows,
       order: [
-        ["updated_date", "ASC"],
-        ["created_date", "ASC"],
+        ["updated_date", "DESC"],
+        ["created_date", "DESC"],
       ],
     });
 

@@ -35,7 +35,7 @@ export default function LayoutDashboard({ children }) {
       if (data[i].nama.toUpperCase() !== "DASHBOARD") {
         if (data[i].nama.toUpperCase() === "DATA PENDUKUNG") {
           result.push(
-            <>
+            <div key={i}>
               <Menu
                 model={data[i].list.map((v, index) => {
                   return {
@@ -62,7 +62,7 @@ export default function LayoutDashboard({ children }) {
                 <span className="text-sm">Data Pendukung</span>
                 <i className="pi pi-chevron-down text-xs"></i>
               </button>
-            </>
+            </div>
           );
         } else {
           result.push(
@@ -100,8 +100,8 @@ export default function LayoutDashboard({ children }) {
                   <Image src="/logo.png" alt="Logo SD" fill sizes="100%" className="object-contain" />
                 </div>
                 <span className="flex flex-col">
-                  <h2 className="font-medium">Sekolah Dasar Negeri 02</h2>
-                  <h4 className="text-sm">Pakulonan Barat</h4>
+                  <h2 className="font-medium">Sekolah Dasar Negeri</h2>
+                  <h4 className="text-sm">Pakulonan Barat 02</h4>
                 </span>
               </div>
             </Link>
