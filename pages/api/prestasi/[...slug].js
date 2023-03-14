@@ -3,6 +3,7 @@ import { decryptCrypto } from "@/utils/crypto";
 import { verify } from "@/utils/jwt";
 import { validateSchema } from "@/validation";
 import { prestasiSchema, viewPrestasiSchema } from "@/validation/prestasi";
+import { Op } from "sequelize";
 
 const db = require("@/database/models");
 const sequelize = db.sequelize;
@@ -20,10 +21,17 @@ async function viewDataPrestasi(req, res) {
     return res.status(RES_BAD_REQUEST.status).json({ status: RES_BAD_REQUEST.status, message: value.message });
   }
 
-  const { semester, tahun_ajaran, first, rows } = value;
+  const { tingkat_kelas, semester, tahun_ajaran, first, rows } = value;
 
   try {
-    const where = semester === "all" ? { tahun_ajaran } : { semester, tahun_ajaran };
+    let where = { tahun_ajaran };
+    if (semester !== "all") {
+      where.semester = semester;
+    }
+    if (tingkat_kelas !== "all") {
+      where[Op.and] = [sequelize.literal(`prestasi.id_siswa IN (SELECT id FROM users WHERE tingkat_kelas = ${tingkat_kelas})`)];
+    }
+
     const prestasi = await Prestasi.findAll({
       where,
       attributes: {

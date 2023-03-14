@@ -29,6 +29,10 @@ export const logout = async () => {
   return await httpCall("POST", API.AUTH_LOGOUT);
 };
 
-export const getDropdownSiswa = async () => {
-  return await httpCall("GET", API.USERS_DROPDOWN_SISWA);
+export const getDropdownSiswa = async (tingkat_kelas) => {
+  return await httpCall("POST", API.USERS_DROPDOWN_SISWA, { tingkat_kelas });
+};
+
+export const getTotalSiswa = async () => {
+  return await httpCall("GET", API.USERS_TOTAL_SISWA);
 };

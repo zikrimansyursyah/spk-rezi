@@ -22,6 +22,11 @@ module.exports = (sequelize, DataTypes) => {
       },
       nisn: DataTypes.STRING(20),
       no_induk_sekolah: DataTypes.STRING(20),
+      tingkat_kelas: {
+        type: DataTypes.ENUM("1", "2", "3", "4", "5", "6", "lulus"),
+        allowNull: false,
+        defaultValue: "lulus",
+      },
       nama: {
         type: DataTypes.STRING(255),
         allowNull: false,

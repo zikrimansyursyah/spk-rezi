@@ -3,6 +3,7 @@ import { decryptCrypto } from "@/utils/crypto";
 import { verify } from "@/utils/jwt";
 import { validateSchema } from "@/validation";
 import { absensiSchema, viewAbsensiSchema } from "@/validation/absensi";
+import { Op } from "sequelize";
 
 const db = require("@/database/models");
 const sequelize = db.sequelize;
@@ -108,11 +109,12 @@ async function viewAbsensi(req, res) {
     return res.status(RES_BAD_REQUEST.status).json({ status: RES_BAD_REQUEST.status, message: value.message });
   }
 
-  const { bulan, tahun, first, rows } = value;
+  const { tingkat_kelas, bulan, tahun, first, rows } = value;
 
   try {
+    let condition = tingkat_kelas === "all" ? { bulan, tahun } : { bulan, tahun, [Op.and]: [sequelize.literal(`absensi.id_siswa IN (SELECT id FROM users WHERE tingkat_kelas = ${tingkat_kelas})`)] };
     const absen = await Absensi.findAll({
-      where: { bulan, tahun },
+      where: condition,
       attributes: {
         exclude: ["created_date", "created_by", "updated_date", "updated_by"],
         include: [
@@ -136,6 +138,7 @@ async function viewAbsensi(req, res) {
       },
       limit: rows,
       offset: first,
+      logging: console.log,
     });
 
     return res.status(200).json({ status: 200, message: "Berhasil Melihat Absensi", data: absen });

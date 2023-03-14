@@ -10,6 +10,7 @@ export const USERS_PUT_EDIT_USER = "/api/user/edit-user";
 export const USERS_ADD_USER = "/api/user/add-user";
 export const USERS_DELETE_USER = "/api/user/delete-user";
 export const USERS_DROPDOWN_SISWA = "/api/user/get-dropdown-siswa";
+export const USERS_TOTAL_SISWA = "/api/user/total-siswa";
 
 // ABSENSI
 export const ABSENSI_TAMBAH = "/api/absensi/add-absen";
@@ -22,6 +23,9 @@ export const PRESTASI_GET_ALL = "/api/prestasi/get-all";
 export const PRESTASI_TAMBAH = "/api/prestasi/add";
 export const PRESTASI_EDIT = "/api/prestasi/edit";
 export const PRESTASI_DELETE = "/api/prestasi/delete";
+
+// PENERIMA BANTUAN
+export const PENERIMA_GET = "/api/penerima-bantuan/get";
 
 // API RESPONSE
 export const RES_METHOD_NOT_ALLOWED = { status: 405, message: "Method Not Allowed" };

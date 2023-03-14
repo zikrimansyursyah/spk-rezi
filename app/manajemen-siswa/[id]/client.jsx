@@ -74,6 +74,7 @@ export default function User({ data }) {
     initialValues: {
       nisn: "",
       no_induk_sekolah: "",
+      tingkat_kelas: null,
       username: "",
       password: "",
       nama: "",
@@ -541,6 +542,30 @@ export default function User({ data }) {
                     className={classNames({ "p-inputtext-sm": true, "p-invalid": formik.touched["nisn"] && formik.errors["nisn"] })}
                   />
                   {getFormErrorMessage("nisn")}
+                </div>
+                <div className="col-span-1 flex flex-col gap-1">
+                  <label htmlFor="tingkat_kelas" className="text-sm">
+                    Tingkat Kelas
+                  </label>
+                  <Dropdown
+                    inputId="tingkat_kelas"
+                    name="tingkat_kelas"
+                    placeholder="pilih tingkat kelas"
+                    disabled={!isEdit}
+                    value={formik.values.tingkat_kelas}
+                    onChange={formik.handleChange}
+                    options={[
+                      { label: "1", value: "1" },
+                      { label: "2", value: "2" },
+                      { label: "3", value: "3" },
+                      { label: "4", value: "4" },
+                      { label: "5", value: "5" },
+                      { label: "6", value: "6" },
+                      { label: "Sudah Lulus", value: "lulus" },
+                    ]}
+                    className={classNames({ "p-inputtext-sm": true, "p-invalid": formik.touched["tingkat_kelas"] && formik.errors["tingkat_kelas"] })}
+                  />
+                  {getFormErrorMessage("tingkat_kelas")}
                 </div>
                 <div className="flex flex-col gap-1">
                   <label htmlFor="username" className="text-sm">

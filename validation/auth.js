@@ -9,6 +9,7 @@ export const loginSchema = yup.object().shape({
 export const userSchema = yup.object().shape({
   nisn: yup.string().min(8, "nisn minimal 8 digit angka").required("nisn harus diisi"),
   no_induk_sekolah: yup.string().min(5, "nomor induk sekolah minimal 5 digit angka").required("nomor induk sekolah harus diisi"),
+  tingkat_kelas: yup.string().required("tingkat kelas harus dipilih"),
   username: yup.string().min(4, "username minimal 4 digit/karakter").required("masukan username/NIS anda"),
   password: yup.string().min(5, "password minimal 6 karakter").required("password harus diisi"),
   nama: yup.string().min(3, "nama minimal 3 karakter").required("nama harus diisi"),

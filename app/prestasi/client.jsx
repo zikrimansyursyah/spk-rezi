@@ -33,6 +33,8 @@ export default function Prestasi() {
 
   const [optionSiswa, setOptionSiswa] = useState([]);
   const [loadingOptionSiswa, setLoadingOptionSiswa] = useState(true);
+  const [tingkatKelas, setTingkatKelas] = useState("all");
+  const [tingkatKelasFilter, setTingkatKelasFilter] = useState("all");
 
   // Dialog
   const [visibleDialogAdd, setVisibleDialogAdd] = useState(false);
@@ -103,7 +105,7 @@ export default function Prestasi() {
 
   const getDataPrestasi = () => {
     setLoadingTable(true);
-    getPrestasi({ first: lazyParams.first, rows: lazyParams.rows, semester, tahun_ajaran: tahunAjaran })
+    getPrestasi({ first: lazyParams.first, rows: lazyParams.rows, semester, tahun_ajaran: tahunAjaran, tingkat_kelas: tingkatKelasFilter })
       .then((res) => {
         if (res.status !== 200) {
           return toast.current.show({ severity: "warn", summary: "Gagal", detail: res?.message });
@@ -156,13 +158,9 @@ export default function Prestasi() {
     }
   };
 
-  const getListSiswa = () => {
-    if (optionSiswa.length > 0) {
-      return;
-    }
-
+  const getListSiswa = (tingkat_kelas = "all") => {
     setLoadingOptionSiswa(true);
-    getDropdownSiswa()
+    getDropdownSiswa(tingkat_kelas)
       .then((res) => {
         if (res.status !== 200) {
           return toast.current.show({ severity: "warn", summary: "Gagal memperoleh data siswa", detail: res.message });
@@ -212,7 +210,7 @@ export default function Prestasi() {
 
   useEffect(() => {
     getDataPrestasi();
-  }, [lazyParams, semester, tahunAjaran]);
+  }, [lazyParams, semester, tahunAjaran, tingkatKelasFilter]);
 
   return (
     <>
@@ -245,6 +243,30 @@ export default function Prestasi() {
           </div>
           <span className="border-b"></span>
           <div className="py-4 px-4 flex gap-4 items-center">
+            <div className="flex flex-col gap-1">
+              <label htmlFor="tingkat_kelas" className="text-sm">
+                Tingkat Kelas
+              </label>
+              <Dropdown
+                inputId="tingkat_kelas"
+                name="tingkat_kelas"
+                placeholder="pilih tingkat kelas"
+                value={tingkatKelasFilter}
+                onChange={(e) => {
+                  setTingkatKelasFilter(e.target.value);
+                }}
+                options={[
+                  { label: "All", value: "all" },
+                  { label: "1", value: "1" },
+                  { label: "2", value: "2" },
+                  { label: "3", value: "3" },
+                  { label: "4", value: "4" },
+                  { label: "5", value: "5" },
+                  { label: "6", value: "6" },
+                ]}
+                className={classNames({ "p-inputtext-sm": true })}
+              />
+            </div>
             <div className="flex flex-col gap-1">
               <label htmlFor="semester_filter" className="text-sm">
                 Semester
@@ -315,22 +337,51 @@ export default function Prestasi() {
         }}
       >
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1">
-            <label htmlFor="id_siswa" className="text-sm">
-              Siswa
-            </label>
-            <Dropdown
-              id="id_siswa"
-              name="id_siswa"
-              value={formik.values.id_siswa}
-              onChange={formik.handleChange}
-              options={optionSiswa}
-              placeholder="pilih siswa"
-              className={classNames({ "p-inputtext-sm": true, "p-invalid": formik.touched["id_siswa"] && formik.errors["id_siswa"] })}
-              emptyMessage="Tidak ada data"
-              disabled={loadingOptionSiswa || tipeDialog === "ubah"}
-            />
-            {getFormErrorMessage("id_siswa")}
+          <div className="grid grid-cols-5 gap-4">
+            {tipeDialog === "tambah" && (
+              <div className="col-span-2 flex flex-col gap-1">
+                <label htmlFor="tingkat_kelas" className="text-sm">
+                  Tingkat Kelas
+                </label>
+                <Dropdown
+                  inputId="tingkat_kelas"
+                  name="tingkat_kelas"
+                  placeholder="pilih tingkat kelas"
+                  value={tingkatKelas}
+                  onChange={(e) => {
+                    setTingkatKelas(e.target.value);
+                    getListSiswa(e.target.value);
+                  }}
+                  options={[
+                    { label: "All", value: "all" },
+                    { label: "1", value: "1" },
+                    { label: "2", value: "2" },
+                    { label: "3", value: "3" },
+                    { label: "4", value: "4" },
+                    { label: "5", value: "5" },
+                    { label: "6", value: "6" },
+                  ]}
+                  className={classNames({ "p-inputtext-sm": true })}
+                />
+              </div>
+            )}
+            <div className={classNames({ "flex flex-col gap-1": true, "col-span-3": tipeDialog === "tambah", "col-span-5": tipeDialog !== "tambah" })}>
+              <label htmlFor="id_siswa" className="text-sm">
+                Siswa
+              </label>
+              <Dropdown
+                id="id_siswa"
+                name="id_siswa"
+                value={formik.values.id_siswa}
+                onChange={formik.handleChange}
+                options={optionSiswa}
+                placeholder="pilih siswa"
+                className={classNames({ "p-inputtext-sm": true, "p-invalid": formik.touched["id_siswa"] && formik.errors["id_siswa"] })}
+                emptyMessage="Tidak ada data"
+                disabled={loadingOptionSiswa || tipeDialog === "ubah"}
+              />
+              {getFormErrorMessage("id_siswa")}
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-1 flex flex-col gap-1">

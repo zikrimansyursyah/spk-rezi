@@ -4,9 +4,10 @@ import { verify } from "@/utils/jwt";
 import { validateSchema } from "@/validation";
 import { userSchema } from "@/validation/auth";
 import { getAllSiswaSchema } from "@/validation/users";
-import { Op } from "sequelize";
+import { Op, QueryTypes } from "sequelize";
 
 const db = require("@/database/models");
+const sequelize = db.sequelize;
 const Users = db.users;
 const Absensi = db.absensi;
 const Prestasi = db.prestasi;
@@ -28,7 +29,7 @@ async function getAll(req, res) {
   try {
     const userData = await Users.findAll({
       where: { user_type: "siswa", [Op.or]: { no_induk_sekolah: { [Op.substring]: search }, nama: { [Op.substring]: search } } },
-      attributes: ["id", "no_induk_sekolah", "nama", "jenis_kelamin", "nama_ayah", "nama_ibu"],
+      attributes: ["id", "no_induk_sekolah", "nama", "jenis_kelamin", "nama_ayah", "nama_ibu", "tingkat_kelas"],
       offset: first,
       limit: rows,
       order: [
@@ -193,21 +194,37 @@ async function deleteSiswa(req, res) {
 }
 
 async function getDropdownSiswa(req, res) {
-  if (req.method.toUpperCase() !== "GET") {
+  if (req.method.toUpperCase() !== "POST") {
     return res.status(RES_METHOD_NOT_ALLOWED.status).json(RES_METHOD_NOT_ALLOWED);
   }
 
+  const { tingkat_kelas } = req.body;
+
   try {
+    let condition = tingkat_kelas === "all" ? { user_type: "siswa" } : { user_type: "siswa", tingkat_kelas };
     const userData = await Users.findAll({
-      where: {
-        user_type: "siswa",
-      },
+      where: condition,
       attributes: ["id", "nama"],
       order: [["nama", "ASC"]],
     });
 
     return res.status(200).json({ status: 200, message: "Berhasil Mendapatkan User", data: userData });
   } catch (error) {
+    return res.status(RES_INTERNAL_SERVER_ERROR.status).json(RES_INTERNAL_SERVER_ERROR);
+  }
+}
+
+async function getCountSiswa(req, res) {
+  if (req.method.toUpperCase() !== "GET") {
+    return res.status(RES_METHOD_NOT_ALLOWED.status).json(RES_METHOD_NOT_ALLOWED);
+  }
+
+  try {
+    const user = await sequelize.query(`SELECT COUNT(*) AS count FROM users WHERE user_type = 'siswa'`, { type: QueryTypes.SELECT });
+
+    return res.status(200).json({ status: 200, message: "Berhasil Mendapatkan User", data: user[0].count });
+  } catch (error) {
+    console.log(error);
     return res.status(RES_INTERNAL_SERVER_ERROR.status).json(RES_INTERNAL_SERVER_ERROR);
   }
 }
@@ -235,6 +252,7 @@ export default async function handler(req, res) {
     "add-user": addSiswa,
     "delete-user": deleteSiswa,
     "get-dropdown-siswa": getDropdownSiswa,
+    "total-siswa": getCountSiswa,
   };
 
   if (routes[api]) {

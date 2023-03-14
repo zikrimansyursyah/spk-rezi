@@ -12,6 +12,7 @@ export const absensiSchema = yup.object().shape({
 });
 
 export const viewAbsensiSchema = yup.object().shape({
+  tingkat_kelas: yup.string().required("wajib memilih tingkat kelas"),
   bulan: yup.string().required("wajib memilih bulan"),
   tahun: yup.string().required("wajib memilih tahun"),
   first: yup.number().required(),

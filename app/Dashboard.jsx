@@ -1,11 +1,41 @@
 "use client";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { AppContext } from "@/context";
 import Image from "next/image";
 import Link from "next/link";
+import { getTotalSiswa } from "@/services/user";
+import { getPenerima } from "@/services/penerimaBantuan";
 
 export default function Dashboard() {
   const { access_token } = useContext(AppContext);
+  const [totalSiswa, setTotalSiswa] = useState(0);
+  const [dataPenerima, setDataPenerima] = useState([]);
+
+  const getTotal = () => {
+    getTotalSiswa().then((res) => {
+      setTotalSiswa(res.data);
+    });
+  };
+
+  const getDataPenerimaBantuan = () => {
+    getPenerima({ tingkat_kelas: "6", semester: "ganjil", tahun_ajaran: "2022/2023" }).then((res) => {
+      if (res.status === 200) {
+        let dataTemp = [];
+        for (let i = 0; i < res.data.ranking.length; i++) {
+          dataTemp.push({
+            no: i + 1,
+            ...res.data.ranking[i],
+          });
+        }
+        setDataPenerima(dataTemp);
+      }
+    });
+  };
+
+  useEffect(() => {
+    getTotal();
+    getDataPenerimaBantuan();
+  }, []);
 
   return (
     <div className="min-h-[94vh] bg-gradient-to-br from-white to-gray-100">
@@ -40,35 +70,26 @@ export default function Dashboard() {
                 <i className="pi pi-external-link text-white group-hover:text-gray-700"></i>
               </Link>
             </div>
-            <div className="text-5xl font-medium text-white">Rp. 17.225.000</div>
+            <div className="text-5xl font-medium text-white">Rp. 1.722.500</div>
             <div className="text-xs text-white">Terakhir diupdate : 22 Februari 2023</div>
           </div>
           <div className="w-full bg-white border rounded-lg hover:shadow-lg hover:shadow-gray-200 hover:border-blue-400 p-5 flex flex-col gap-4 justify-between">
             <div className="flex justify-between items-center">
-              <h3 className="font-medium">Penerima Dana Terbaru</h3>
+              <h3 className="font-medium">Penerima Dana Terbaru {new Date().getFullYear()}</h3>
               <Link href="/penerima-bantuan" className="w-7 h-7 flex justify-center items-center rounded-md hover:bg-gray-100 hover:shadow-sm">
                 <i className="pi pi-external-link"></i>
               </Link>
             </div>
-            <div className="flex flex-col gap-2">
-              <div className="grid grid-cols-3 p-2 border rounded hover:bg-blue-400 group hover:shadow-sm">
-                <span className="col-span-2 border-r pr-4 font-medium group-hover:text-white">Azka</span>
-                <span className="col-span-1 pl-4 text-gray-600 font-light group-hover:text-white">124782320</span>
+            {dataPenerima.length === 0 && <div>tidak ada data</div>}
+            {(dataPenerima || []).map((item, index) => (
+              <div key={index} className="flex flex-col gap-2">
+                <div className="grid grid-cols-3 p-2 border rounded hover:bg-blue-400 group hover:shadow-sm">
+                  <span className="col-span-2 border-r pr-4 font-medium group-hover:text-white">{item.nama}</span>
+                  <span className="col-span-1 pl-4 text-gray-600 font-light group-hover:text-white">{item.no_induk_sekolah}</span>
+                </div>
               </div>
-            </div>
-            <div className="flex flex-col gap-2">
-              <div className="grid grid-cols-3 p-2 border rounded hover:bg-blue-400 group hover:shadow-sm">
-                <span className="col-span-2 border-r pr-4 font-medium group-hover:text-white">Bilal Ramadhan</span>
-                <span className="col-span-1 pl-4 text-gray-600 font-light group-hover:text-white">124882684</span>
-              </div>
-            </div>
-            <div className="flex flex-col gap-2">
-              <div className="grid grid-cols-3 p-2 border rounded hover:bg-blue-400 group hover:shadow-sm">
-                <span className="col-span-2 border-r pr-4 font-medium group-hover:text-white">Nurhayati J</span>
-                <span className="col-span-1 pl-4 text-gray-600 font-light group-hover:text-white">124999784</span>
-              </div>
-            </div>
-            <div className="text-xs">Terakhir diupdate : 22 Februari 2023</div>
+            ))}
+            <div className="text-xs">Terakhir diupdate : hari ini</div>
           </div>
           <div className="w-full h-48 bg-white border rounded-lg hover:shadow-lg hover:shadow-gray-200 hover:border-blue-400 p-5 flex flex-col justify-between">
             <div className="flex justify-between items-center">
@@ -80,7 +101,7 @@ export default function Dashboard() {
               )}
             </div>
             <div className="text-6xl font-medium">
-              485 <span className="text-4xl">Siswa</span>
+              {totalSiswa} <span className="text-4xl">Siswa</span>
             </div>
             <div className="text-xs">Terakhir diupdate : 22 Februari 2023</div>
           </div>

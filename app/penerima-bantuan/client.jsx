@@ -1,40 +1,20 @@
 "use client";
 
 import { AppContext } from "@/context";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 
 // Components
 import { Dropdown } from "primereact/dropdown";
+import { getPenerima } from "@/services/penerimaBantuan";
 
 export default function PenerimaBantuan() {
   const { classNames, loading, toast } = useContext(AppContext);
 
   const [semester, setSemester] = useState("ganjil");
   const [tahunAjaran, setTahunAjaran] = useState(`${(new Date().getFullYear() - 1).toString()}/${new Date().getFullYear().toString()}`);
+  const [tingkatKelas, setTingkatKelas] = useState("1");
 
-  const [dataPenerima, setDataPenerima] = useState([
-    {
-      no: 1,
-      nama: "Dzikri Mansyursyah Amin",
-      no_induk_sekolah: "123456",
-      nama_ayah: "Fox",
-      nama_ibu: "Megan",
-    },
-    {
-      no: 2,
-      nama: "Dzikri Mansyursyah Amin",
-      no_induk_sekolah: "123456",
-      nama_ayah: "Fox",
-      nama_ibu: "Megan",
-    },
-    {
-      no: 3,
-      nama: "Dzikri Mansyursyah Amin",
-      no_induk_sekolah: "123456",
-      nama_ayah: "Fox",
-      nama_ibu: "Megan",
-    },
-  ]);
+  const [dataPenerima, setDataPenerima] = useState([]);
 
   // Options
   const getTahunAjaran = () => {
@@ -51,6 +31,25 @@ export default function PenerimaBantuan() {
 
   const optionTahunAjaran = getTahunAjaran();
 
+  const getListPenerima = () => {
+    loading({ text: "Kami sedang mengkalkulasi penerima bantuan", visible: true });
+    getPenerima({ tingkat_kelas: tingkatKelas, semester, tahun_ajaran: tahunAjaran })
+      .then((res) => {
+        toast.current.show({ severity: res.status === 200 ? "success" : "warn", summary: res.status === 200 ? "Berhasil" : "Gagal", detail: res.message });
+        if (res.status === 200) {
+          let dataTemp = [];
+          for (let i = 0; i < res.data.ranking.length; i++) {
+            dataTemp.push({
+              no: i + 1,
+              ...res.data.ranking[i],
+            });
+          }
+          setDataPenerima(dataTemp);
+        }
+      })
+      .finally(() => loading({ text: null, visible: false }));
+  };
+
   return (
     <>
       <div className="p-4 flex fixed w-full justify-between items-center bg-white border-b shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.02)] z-50">
@@ -62,6 +61,29 @@ export default function PenerimaBantuan() {
           </div>
         </div>
         <div className="flex gap-4 items-end">
+          <div className="flex flex-col gap-1">
+            <label htmlFor="tingkat_kelas" className="text-sm">
+              Tingkat Kelas
+            </label>
+            <Dropdown
+              inputId="tingkat_kelas"
+              name="tingkat_kelas"
+              placeholder="pilih tingkat kelas"
+              value={tingkatKelas}
+              onChange={(e) => {
+                setTingkatKelas(e.target.value);
+              }}
+              options={[
+                { label: "1", value: "1" },
+                { label: "2", value: "2" },
+                { label: "3", value: "3" },
+                { label: "4", value: "4" },
+                { label: "5", value: "5" },
+                { label: "6", value: "6" },
+              ]}
+              className={classNames({ "p-inputtext-sm": true })}
+            />
+          </div>
           <div className="flex flex-col gap-1">
             <label htmlFor="semester_filter" className="text-sm">
               Semester
@@ -93,7 +115,11 @@ export default function PenerimaBantuan() {
               className="p-inputtext-sm w-26"
             />
           </div>
-          <button type="submit" className="h-11 flex items-center gap-3 bg-[#2293EE] py-2 px-4 rounded-lg hover:bg-[#4da5ed] active:scale-[0.97] focus:ring focus:ring-blue-200">
+          <button
+            onClick={getListPenerima}
+            type="submit"
+            className="h-11 flex items-center gap-3 bg-[#2293EE] py-2 px-4 rounded-lg hover:bg-[#4da5ed] active:scale-[0.97] focus:ring focus:ring-blue-200"
+          >
             <i className="pi pi-search text-white text-xs font-medium"></i>
             <span className="text-sm font-medium text-white">Tentukan</span>
           </button>
@@ -111,6 +137,14 @@ export default function PenerimaBantuan() {
             <span className="text-xs font-medium text-white">Lihat Detail Perhitungan</span>
           </button>
         </div>
+        {dataPenerima.length === 0 && (
+          <div className="flex justify-center items-center mt-10">
+            <div className="p-4 bg-[#2293EE] animate-pulse rounded-lg flex flex-col gap-1 items-center">
+              <span className="text-white font-medium">Tidak Ada Data</span>
+              <span className="text-sm text-white">coba cari data dengan filter yang berbeda</span>
+            </div>
+          </div>
+        )}
       </div>
       <div className="px-4 flex flex-col gap-4">
         {(dataPenerima || []).map((item, index) => (
@@ -137,9 +171,13 @@ export default function PenerimaBantuan() {
               <span className="text-xs text-gray-500">Nama Ibu</span>
               <span className="font-medium">{item.nama_ibu}</span>
             </div>
-            <div className="col-span-2 flex items-center justify-end">
+            <div className="col-span-1 flex flex-col gap-1">
+              <span className="text-xs text-gray-500">Nilai</span>
+              <span className="font-medium">{item.nilai}</span>
+            </div>
+            <div className="col-span-1 flex items-center justify-end">
               <button type="submit" className="flex items-center gap-3 bg-[#2293EE] py-2 px-4 rounded-lg hover:bg-[#4da5ed] active:scale-[0.97] focus:ring focus:ring-blue-200">
-                <span className="text-xs font-medium text-white">Lihat Detail</span>
+                <span className="text-[0.6rem] font-medium text-white">Lihat Detail</span>
               </button>
             </div>
           </div>

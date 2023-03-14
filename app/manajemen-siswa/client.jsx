@@ -124,6 +124,14 @@ export default function ManajemenSiswa() {
     );
   };
 
+  const tingkatKelasBodyTemplate = (data) => {
+    return (
+      <>
+        <span>{data.tingkat_kelas === "lulus" ? "Sudah Lulus" : `Kelas ${data.tingkat_kelas}`}</span>
+      </>
+    );
+  };
+
   useEffect(() => {
     getDataSiswa();
   }, [lazyParams]);
@@ -153,8 +161,7 @@ export default function ManajemenSiswa() {
           </div>
           <span className="border-b"></span>
           <div className="py-4 px-4 flex justify-between items-center">
-            <div>
-            </div>
+            <div></div>
             <div className="flex">
               <span className="p-input-icon-left">
                 <i className="pi pi-search" />
@@ -191,6 +198,7 @@ export default function ManajemenSiswa() {
             <Column field="no" header="#" bodyClassName="td-h-center" headerClassName="th-h-center" />
             <Column field="no_induk_sekolah" header="Nomor Induk Sekolah" />
             <Column field="nama" header="Nama Siswa" />
+            <Column field="tingkat_kelas" header="Tingkat Kelas" body={tingkatKelasBodyTemplate} />
             <Column field="jenis_kelamin" header="Jenis Kelamin" />
             <Column field="nama_ayah" header="Nama Ayah" />
             <Column field="nama_ibu" header="Nama Ibu" />
