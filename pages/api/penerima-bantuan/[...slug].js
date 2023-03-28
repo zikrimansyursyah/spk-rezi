@@ -133,7 +133,7 @@ async function viewDataPenerima(req, res) {
         nama: dataUser.nama,
         nama_ayah: dataUser.nama_ayah,
         nama_ibu: dataUser.nama_ibu,
-        nilai: hasil,
+        nilai: parseFloat(hasil).toFixed(3),
       });
     });
 

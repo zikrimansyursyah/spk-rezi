@@ -133,9 +133,11 @@ export default function PenerimaBantuan() {
             </span>
             <span className="text-sm text-gray-500">daftar penerima bantuan yang terlampir dibawah ini telah dikalkulasikan secara valid dengan perhitungan Simple Additive Weighting</span>
           </div>
-          <button type="submit" className="flex items-center h-fit gap-3 bg-[#2293EE] py-2 px-4 rounded-lg hover:bg-[#4da5ed] active:scale-[0.97] focus:ring focus:ring-blue-200">
-            <span className="text-xs font-medium text-white">Lihat Detail Perhitungan</span>
-          </button>
+          {dataPenerima.length > 0 && (
+            <button type="submit" className="flex items-center h-fit gap-3 bg-[#2293EE] py-2 px-4 rounded-lg hover:bg-[#4da5ed] active:scale-[0.97] focus:ring focus:ring-blue-200">
+              <span className="text-xs font-medium text-white">Lihat Detail Perhitungan</span>
+            </button>
+          )}
         </div>
         {dataPenerima.length === 0 && (
           <div className="flex justify-center items-center mt-10">
