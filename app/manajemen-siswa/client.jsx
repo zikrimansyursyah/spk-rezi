@@ -22,6 +22,7 @@ export default function ManajemenSiswa() {
   // Table
   const [dataUser, setDataUser] = useState([]);
   const [loadingTable, setLoadingTable] = useState(true);
+  const [totalRecords, setTotalRecords] = useState(0);
   const [lazyParams, setLazyParams] = useState({
     first: 0,
     rows: 10,
@@ -97,6 +98,7 @@ export default function ManajemenSiswa() {
         }
 
         setDataUser(dataTemp);
+        setTotalRecords(res.count);
       })
       .catch((err) => {
         toast.current.show({ severity: "error", summary: "Internal Server Error", detail: err?.message });
@@ -185,11 +187,13 @@ export default function ManajemenSiswa() {
             showGridlines
             stripedRows
             paginator
+            lazy
             rowsPerPageOptions={[10, 25, 50]}
             rows={lazyParams.rows}
             first={lazyParams.first}
             value={dataUser}
             loading={loadingTable}
+            totalRecords={totalRecords}
             onPage={(e) => setLazyParams(e)}
             size="small"
             emptyMessage="Data tidak ditemukan"

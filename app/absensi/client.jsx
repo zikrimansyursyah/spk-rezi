@@ -31,6 +31,7 @@ export default function User() {
   const [tahun, setTahun] = useState(new Date().getFullYear().toString());
   const [loadingTable, setLoadingTable] = useState(true);
   const [dataAbsensi, setDataAbsensi] = useState([]);
+  const [totalRecords, setTotalRecords] = useState(0);
   const [lazyParams, setLazyParams] = useState({
     first: 0,
     rows: 10,
@@ -126,6 +127,7 @@ export default function User() {
           });
         }
         setDataAbsensi(dataTemp);
+        setTotalRecords(res.count);
       })
       .finally(() => setLoadingTable(false));
   };
@@ -314,11 +316,13 @@ export default function User() {
             showGridlines
             stripedRows
             paginator
+            lazy
             rowsPerPageOptions={[10, 25, 50]}
             rows={lazyParams.rows}
             first={lazyParams.first}
             value={dataAbsensi}
             loading={loadingTable}
+            totalRecords={totalRecords}
             onPage={(e) => setLazyParams(e)}
             size="small"
             emptyMessage="Data tidak ditemukan"

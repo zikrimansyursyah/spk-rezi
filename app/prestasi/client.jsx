@@ -26,6 +26,7 @@ export default function Prestasi() {
   const [tahunAjaran, setTahunAjaran] = useState(`${(new Date().getFullYear() - 1).toString()}/${new Date().getFullYear().toString()}`);
   const [loadingTable, setLoadingTable] = useState(true);
   const [dataPrestasi, setDataPrestasi] = useState([]);
+  const [totalRecords, setTotalRecords] = useState(0);
   const [lazyParams, setLazyParams] = useState({
     first: 0,
     rows: 10,
@@ -120,6 +121,7 @@ export default function Prestasi() {
           });
         }
         setDataPrestasi(dataTemp);
+        setTotalRecords(res.count);
       })
       .finally(() => setLoadingTable(false));
   };
@@ -306,11 +308,13 @@ export default function Prestasi() {
             showGridlines
             stripedRows
             paginator
+            lazy
             rowsPerPageOptions={[10, 25, 50]}
             rows={lazyParams.rows}
             first={lazyParams.first}
             value={dataPrestasi}
             loading={loadingTable}
+            totalRecords={totalRecords}
             onPage={(e) => setLazyParams(e)}
             size="small"
             emptyMessage="Data tidak ditemukan"

@@ -113,7 +113,7 @@ async function viewAbsensi(req, res) {
 
   try {
     let condition = tingkat_kelas === "all" ? { bulan, tahun } : { bulan, tahun, [Op.and]: [sequelize.literal(`absensi.id_siswa IN (SELECT id FROM users WHERE tingkat_kelas = ${tingkat_kelas})`)] };
-    const absen = await Absensi.findAll({
+    const { rows: data, count } = await Absensi.findAndCountAll({
       where: condition,
       attributes: {
         exclude: ["created_date", "created_by", "updated_date", "updated_by"],
@@ -141,7 +141,7 @@ async function viewAbsensi(req, res) {
       logging: console.log,
     });
 
-    return res.status(200).json({ status: 200, message: "Berhasil Melihat Absensi", data: absen });
+    return res.status(200).json({ status: 200, message: "Berhasil Melihat Absensi", data, count });
   } catch (error) {
     console.log(error);
     return res.status(RES_INTERNAL_SERVER_ERROR.status).json(RES_INTERNAL_SERVER_ERROR);

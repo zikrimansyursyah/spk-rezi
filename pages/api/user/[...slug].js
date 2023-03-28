@@ -27,7 +27,7 @@ async function getAll(req, res) {
   const { first, rows, search } = value;
 
   try {
-    const userData = await Users.findAll({
+    const { rows: data, count } = await Users.findAndCountAll({
       where: { user_type: "siswa", [Op.or]: { no_induk_sekolah: { [Op.substring]: search }, nama: { [Op.substring]: search } } },
       attributes: ["id", "no_induk_sekolah", "nama", "jenis_kelamin", "nama_ayah", "nama_ibu", "tingkat_kelas"],
       offset: first,
@@ -38,7 +38,7 @@ async function getAll(req, res) {
       ],
     });
 
-    return res.status(200).json({ status: 200, message: "Berhasil Mendapatkan Data User", data: userData });
+    return res.status(200).json({ status: 200, message: "Berhasil Mendapatkan Data User", data, count });
   } catch (error) {
     return res.status(RES_INTERNAL_SERVER_ERROR.status).json(RES_INTERNAL_SERVER_ERROR);
   }

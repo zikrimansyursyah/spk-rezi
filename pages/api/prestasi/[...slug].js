@@ -32,7 +32,7 @@ async function viewDataPrestasi(req, res) {
       where[Op.and] = [sequelize.literal(`prestasi.id_siswa IN (SELECT id FROM users WHERE tingkat_kelas = ${tingkat_kelas})`)];
     }
 
-    const prestasi = await Prestasi.findAll({
+    const { rows: data, count } = await Prestasi.findAndCountAll({
       where,
       attributes: {
         exclude: ["created_date", "created_by", "updated_date", "updated_by"],
@@ -59,7 +59,7 @@ async function viewDataPrestasi(req, res) {
       offset: first,
     });
 
-    return res.status(200).json({ status: 200, message: "Berhasil Melihat data Prestasi", data: prestasi });
+    return res.status(200).json({ status: 200, message: "Berhasil Melihat data Prestasi", data, count });
   } catch (error) {
     console.log(error);
     return res.status(RES_INTERNAL_SERVER_ERROR.status).json(RES_INTERNAL_SERVER_ERROR);

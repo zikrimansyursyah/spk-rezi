@@ -50,7 +50,7 @@ async function viewDataPenerima(req, res) {
       ELSE 1
     END AS c3,
     CASE 
-      WHEN (a.pendapatan_perbulan_ayah + a.pendapatan_perbulan_ibu) < 3000000 THEN 1
+      WHEN (a.pendapatan_perbulan_ayah + a.pendapatan_perbulan_ibu) <= 3000000 THEN 1
       WHEN (a.pendapatan_perbulan_ayah + a.pendapatan_perbulan_ibu) > 3000000 AND (a.pendapatan_perbulan_ayah + a.pendapatan_perbulan_ibu) < 5000001 THEN 2
       WHEN (a.pendapatan_perbulan_ayah + a.pendapatan_perbulan_ibu) > 5000000 AND (a.pendapatan_perbulan_ayah + a.pendapatan_perbulan_ibu) < 7000001 THEN 3
       ELSE 4
