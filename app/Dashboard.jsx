@@ -18,7 +18,7 @@ export default function Dashboard() {
   };
 
   const getDataPenerimaBantuan = () => {
-    getPenerima({ tingkat_kelas: "6", semester: "ganjil", tahun_ajaran: "2022/2023" }).then((res) => {
+    getPenerima({ tingkat_kelas: "6", semester: "ganjil", tahun_ajaran: "2022/2023", first: 0, rows: 5 }).then((res) => {
       if (res.status === 200) {
         let dataTemp = [];
         for (let i = 0; i < res.data.ranking.length; i++) {

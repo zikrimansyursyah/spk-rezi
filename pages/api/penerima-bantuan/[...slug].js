@@ -23,7 +23,7 @@ async function viewDataPenerima(req, res) {
     return res.status(RES_BAD_REQUEST.status).json({ status: RES_BAD_REQUEST.status, message: value.message });
   }
 
-  const { tingkat_kelas, semester, tahun_ajaran } = value;
+  const { first, rows, tingkat_kelas, semester, tahun_ajaran, get_all } = value;
 
   try {
     // MENENTUKAN DATA WHERE SEBELUM EXECUTE QUERY
@@ -31,7 +31,7 @@ async function viewDataPenerima(req, res) {
     const bulan = semester === "ganjil" ? ["'Juli'", "'Agustus'", "'September'", "'Oktober'", "'November'", "'Desember'"] : ["'Januari'", "'Februari'", "'Maret'", "'April'", "'Mei'", "'Juni'"];
 
     // GET DATA SISWA - ABSENSI - PRESTASI
-    const data = await sequelize.query(
+    let data = await sequelize.query(
       `
     SELECT a.id, a.no_induk_sekolah, a.nama, a.nama_ayah, a.nama_ibu,
     CASE 
@@ -138,6 +138,16 @@ async function viewDataPenerima(req, res) {
     });
 
     hasilAkhir.sort((a, b) => b.nilai - a.nilai);
+
+    if (!get_all) {
+      let resultTemp = {};
+      hasilAkhir = hasilAkhir.slice(first, rows);
+      data = data.filter((v) => hasilAkhir.map((hs) => hs.id).includes(v.id));
+      for (const { id } of hasilAkhir) {
+        resultTemp[id] = result[id];
+      }
+      result = resultTemp;
+    }
 
     return res.status(200).json({ status: 200, message: "Berhasil Mendapatkan Data Penerima Bantuan", data: { data, attributes, result, ranking: hasilAkhir } });
   } catch (error) {

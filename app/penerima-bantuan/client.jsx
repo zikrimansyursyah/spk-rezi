@@ -13,7 +13,7 @@ export default function PenerimaBantuan() {
   const [semester, setSemester] = useState("ganjil");
   const [tahunAjaran, setTahunAjaran] = useState(`${(new Date().getFullYear() - 1).toString()}/${new Date().getFullYear().toString()}`);
   const [tingkatKelas, setTingkatKelas] = useState("1");
-
+  const [limit, setLimit] = useState(3);
   const [dataPenerima, setDataPenerima] = useState([]);
 
   // Options
@@ -33,7 +33,7 @@ export default function PenerimaBantuan() {
 
   const getListPenerima = () => {
     loading({ text: "Kami sedang mengkalkulasi penerima bantuan", visible: true });
-    getPenerima({ tingkat_kelas: tingkatKelas, semester, tahun_ajaran: tahunAjaran })
+    getPenerima({ tingkat_kelas: tingkatKelas, semester, tahun_ajaran: tahunAjaran, first: 0, rows: limit })
       .then((res) => {
         toast.current.show({ severity: res.status === 200 ? "success" : "warn", summary: res.status === 200 ? "Berhasil" : "Gagal", detail: res.message });
         if (res.status === 200) {
@@ -113,6 +113,25 @@ export default function PenerimaBantuan() {
               options={optionTahunAjaran}
               placeholder="tahun ajaran"
               className="p-inputtext-sm w-26"
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label htmlFor="limit" className="text-sm">
+              Limit
+            </label>
+            <Dropdown
+              id="limit"
+              name="limit"
+              value={limit}
+              onChange={(e) => setLimit(e.target.value)}
+              options={[
+                { label: 3, value: 3 },
+                { label: 5, value: 5 },
+                { label: 10, value: 10 },
+                { label: 20, value: 20 },
+              ]}
+              placeholder="limit"
+              className="p-inputtext-sm w-24"
             />
           </div>
           <button
