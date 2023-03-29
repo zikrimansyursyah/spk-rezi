@@ -129,6 +129,7 @@ export default function PenerimaBantuan() {
                 { label: 5, value: 5 },
                 { label: 10, value: 10 },
                 { label: 20, value: 20 },
+                { label: 40, value: 40 },
               ]}
               placeholder="limit"
               className="p-inputtext-sm w-24"
