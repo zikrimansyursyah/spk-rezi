@@ -41,7 +41,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      jumlah_saudara_kandung: {
+      jumlah_anggota_keluarga: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },

@@ -51,7 +51,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(100),
         allowNull: false,
       },
-      jumlah_saudara_kandung: {
+      jumlah_anggota_keluarga: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },

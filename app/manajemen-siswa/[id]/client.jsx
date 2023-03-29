@@ -84,7 +84,7 @@ export default function User({ data }) {
       alamat: "",
       no_telp: "",
       status_tempat_tinggal: null,
-      jumlah_saudara_kandung: 0,
+      jumlah_anggota_keluarga: 0,
       is_ayah_bekerja: null,
       nama_ayah: "",
       jenis_pekerjaan_ayah: "",
@@ -304,20 +304,21 @@ export default function User({ data }) {
                   {getFormErrorMessage("status_tempat_tinggal")}
                 </div>
                 <div className="col-span-2 flex flex-col gap-1">
-                  <label htmlFor="jumlah_saudara_kandung" className="text-sm">
-                    Jumlah Saudara Kandung
+                  <label htmlFor="jumlah_anggota_keluarga" className="text-sm">
+                    Jumlah Anggota Keluarga
                   </label>
                   <InputText
-                    id="jumlah_saudara_kandung"
-                    name="jumlah_saudara_kandung"
-                    placeholder="jumlah saudara kandung"
+                    id="jumlah_anggota_keluarga"
+                    name="jumlah_anggota_keluarga"
+                    placeholder="jumlah dalam 1 KK"
                     disabled={!isEdit}
                     keyfilter="int"
-                    value={formik.values.jumlah_saudara_kandung}
+                    value={formik.values.jumlah_anggota_keluarga}
                     onChange={formik.handleChange}
-                    className={classNames({ "p-inputtext-sm": true, "p-invalid": formik.touched["jumlah_saudara_kandung"] && formik.errors["jumlah_saudara_kandung"] })}
+                    className={classNames({ "p-inputtext-sm": true, "p-invalid": formik.touched["jumlah_anggota_keluarga"] && formik.errors["jumlah_anggota_keluarga"] })}
                   />
-                  {getFormErrorMessage("jumlah_saudara_kandung")}
+                  <small><span className="text-red-500">*</span> jumlah dalam satu kartu keluarga</small>
+                  {getFormErrorMessage("jumlah_anggota_keluarga")}
                 </div>
               </div>
               <div className="grid grid-cols-2 border-t pt-2 mt-2">

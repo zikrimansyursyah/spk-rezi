@@ -177,7 +177,7 @@ CREATE TABLE `users` (
   `alamat` varchar(255) DEFAULT NULL,
   `no_telp` varchar(255) DEFAULT NULL,
   `status_tempat_tinggal` varchar(255) NOT NULL,
-  `jumlah_saudara_kandung` int(10) NOT NULL,
+  `jumlah_anggota_keluarga` int(10) NOT NULL,
   `is_ayah_bekerja` tinyint(1) NOT NULL,
   `nama_ayah` varchar(255) NOT NULL,
   `jenis_pekerjaan_ayah` varchar(255) NOT NULL,
@@ -196,7 +196,7 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `user_type`, `nisn`, `no_induk_sekolah`, `nama`, `username`, `password`, `tempat_lahir`, `tanggal_lahir`, `jenis_kelamin`, `alamat`, `no_telp`, `status_tempat_tinggal`, `jumlah_saudara_kandung`, `is_ayah_bekerja`, `nama_ayah`, `jenis_pekerjaan_ayah`, `pendapatan_perbulan_ayah`, `is_ibu_bekerja`, `nama_ibu`, `jenis_pekerjaan_ibu`, `pendapatan_perbulan_ibu`, `created_date`, `created_by`, `updated_date`, `updated_by`) VALUES
+INSERT INTO `users` (`id`, `user_type`, `nisn`, `no_induk_sekolah`, `nama`, `username`, `password`, `tempat_lahir`, `tanggal_lahir`, `jenis_kelamin`, `alamat`, `no_telp`, `status_tempat_tinggal`, `jumlah_anggota_keluarga`, `is_ayah_bekerja`, `nama_ayah`, `jenis_pekerjaan_ayah`, `pendapatan_perbulan_ayah`, `is_ibu_bekerja`, `nama_ibu`, `jenis_pekerjaan_ibu`, `pendapatan_perbulan_ibu`, `created_date`, `created_by`, `updated_date`, `updated_by`) VALUES
 (1, 'admin', NULL, NULL, 'Administrator', 'admin', 'U2FsdGVkX19I3j53q2XRLGGUh+5sRbmxKpSbaICMHKs=', NULL, NULL, 'laki-laki', NULL, NULL, 'pribadi', 0, 1, 'Superadmin', 'Karyawan Swasta', 0, 0, 'Mom admin', 'Tidak Bekerja', 0, '2023-03-04 11:41:43', 1, NULL, NULL),
 (5, 'siswa', '9994855512', '12345', 'Dzikri Mansyursyah Amin', 'zikri', 'U2FsdGVkX1+/xDUafxMMeJWdRmokl7GkvLO08/1v4d4=', 'Jakarta', '2023-03-14 17:00:00', 'laki-laki', 'Cendana V Blok D5 No. 17 RT. 04, RW.06, Pondok Rejeki, Kutabaru, Pasar Kemis', '085219623081', 'pribadi', 0, 0, 'John', 'Tidak Bekerja', 0, 1, 'Mom admin', 'Aparatur Sipil Negara', 123331212, '2023-03-07 17:14:41', 1, '2023-03-07 19:03:59', 1),
 (6, 'siswa', '123123123123', '999888777', 'Egi', 'egi17', 'U2FsdGVkX18IIS5N5+5m4qve9ZG7lCVmzqLtj2jZ010=', 'Manado', '2023-03-08 17:00:00', 'laki-laki', 'Jakarta', '085219623081', 'mengontrak', 0, 1, 'John', 'Pegawai Swasta', 5000000, 0, 'Yunita M', '', 0, '2023-03-08 15:41:58', 1, '2023-03-08 15:41:58', 1);

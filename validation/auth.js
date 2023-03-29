@@ -19,7 +19,7 @@ export const userSchema = yup.object().shape({
   alamat: yup.string().min(5, "alamat minimal 5 karakter").required("alamat harus diisi"),
   no_telp: yup.string().min(7, "nomor telepon minimal 7 karakter").required("nomor telepon harus diisi"),
   status_tempat_tinggal: yup.string().required("status tempat tinggal harus dipilih"),
-  jumlah_saudara_kandung: yup.number().required("jumlah saudara kandung harus diisi"),
+  jumlah_anggota_keluarga: yup.number().required("jumlah saudara kandung harus diisi"),
   is_ayah_bekerja: yup.boolean().required("status pekerjaan ayah wajib dipilih"),
   nama_ayah: yup.string().min(3, "nama ayah minimal 3 karakter").required("nama ayah harus diisi"),
   jenis_pekerjaan_ayah: yup.string().optional(),

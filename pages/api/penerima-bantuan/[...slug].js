@@ -35,9 +35,9 @@ async function viewDataPenerima(req, res) {
       `
     SELECT a.id, a.no_induk_sekolah, a.nama, a.nama_ayah, a.nama_ibu,
     CASE 
-      WHEN (a.jumlah_saudara_kandung + 2) = 2 THEN 1
-      WHEN (a.jumlah_saudara_kandung + 2) = 3 THEN 2
-      WHEN (a.jumlah_saudara_kandung + 2) IN (4,5) THEN 3
+      WHEN a.jumlah_anggota_keluarga = 2 THEN 1
+      WHEN a.jumlah_anggota_keluarga = 3 THEN 2
+      WHEN a.jumlah_anggota_keluarga IN (4,5) THEN 3
       ELSE 4
     END AS c1,
     CASE 
