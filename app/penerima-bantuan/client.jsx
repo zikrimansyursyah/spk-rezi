@@ -192,6 +192,11 @@ export default function PenerimaBantuan() {
               dataTempAttributes.push(res.data.attributes[key]);
             }
 
+            let dataTempRawData = [];
+            for (const { id } of res.data.ranking) {
+              dataTempRawData.push(res.data.data.find((item) => item.id === id));
+            }
+
             let dataTempResult = [];
             let dataTempRawAkhir = [];
             for (const { id, nilai } of res.data.ranking) {
@@ -221,7 +226,7 @@ export default function PenerimaBantuan() {
               }
             }
 
-            setRawData(res.data.data);
+            setRawData(dataTempRawData);
             setRawAkhir(dataTempRawAkhir);
             setRawAttributes(dataTempAttributes);
             setRawResult(dataTempResult);
