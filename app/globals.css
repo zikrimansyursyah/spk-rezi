@@ -30,3 +30,24 @@ a {
 .th-h-center > .p-column-header-content {
   justify-content: center;
 }
+
+.p-dialog .p-dialog-header.dialog-header-penilaian {
+  padding: .7rem 1rem;
+  border-radius: 1rem 1rem 0 0;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.p-dialog-header.dialog-header-penilaian > .p-dialog-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.p-dialog .p-dialog-content.dialog-content-penilaian {
+  padding: 0;
+  border-radius: 0 0 1rem 1rem;
+  background-color: #F9F8F9;
+}
+
+.p-timeline-vertical.p-timeline-alternate .p-timeline-event:nth-child(even) .p-timeline-event-content {
+  text-align: left;
+}

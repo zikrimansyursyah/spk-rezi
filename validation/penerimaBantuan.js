@@ -7,4 +7,5 @@ export const penerimaBantuanSchema = yup.object().shape({
   semester: yup.string().required("wajib memilih semester"),
   tahun_ajaran: yup.string().required("wajib memilih tahun ajaran"),
   get_all: yup.boolean().optional(),
+  user_id: yup.number().optional(),
 });

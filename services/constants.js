@@ -26,6 +26,13 @@ export const PRESTASI_DELETE = "/api/prestasi/delete";
 
 // PENERIMA BANTUAN
 export const PENERIMA_GET = "/api/penerima-bantuan/get";
+export const PENERIMA_GET_DETAIL_PERHITUNGAN = "/api/penerima-bantuan/get-detail-perhitungan";
+export const TABLE_PENILAIAN = [
+  { keterangan: "Rendah", nilai: 1 },
+  { keterangan: "Sedang", nilai: 2 },
+  { keterangan: "Tinggi", nilai: 3 },
+  { keterangan: "Sangat Tinggi", nilai: 4 },
+]
 
 // API RESPONSE
 export const RES_METHOD_NOT_ALLOWED = { status: 405, message: "Method Not Allowed" };

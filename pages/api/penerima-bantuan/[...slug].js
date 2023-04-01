@@ -1,15 +1,13 @@
-import { RES_BAD_REQUEST, RES_INTERNAL_SERVER_ERROR, RES_METHOD_NOT_ALLOWED, RES_UNAUTHORIZE } from "@/services/constants";
+import { RES_BAD_REQUEST, RES_INTERNAL_SERVER_ERROR, RES_METHOD_NOT_ALLOWED, RES_UNAUTHORIZE, TABLE_PENILAIAN } from "@/services/constants";
 import { decryptCrypto } from "@/utils/crypto";
 import { verify } from "@/utils/jwt";
 import { validateSchema } from "@/validation";
 import { penerimaBantuanSchema } from "@/validation/penerimaBantuan";
-import { Op, QueryTypes } from "sequelize";
+import { QueryTypes } from "sequelize";
 
 const db = require("@/database/models");
 const sequelize = db.sequelize;
-const Users = db.users;
-const Absensi = db.absensi;
-const Prestasi = db.prestasi;
+const Bobot = db.bobot;
 
 async function viewDataPenerima(req, res) {
   if (req.method.toUpperCase() !== "POST") {
@@ -23,7 +21,7 @@ async function viewDataPenerima(req, res) {
     return res.status(RES_BAD_REQUEST.status).json({ status: RES_BAD_REQUEST.status, message: value.message });
   }
 
-  const { first, rows, tingkat_kelas, semester, tahun_ajaran, get_all } = value;
+  const { first, rows, tingkat_kelas, semester, tahun_ajaran, get_all, user_id } = value;
 
   try {
     // MENENTUKAN DATA WHERE SEBELUM EXECUTE QUERY
@@ -78,7 +76,7 @@ async function viewDataPenerima(req, res) {
       WHERE id_siswa = u.id
       AND tahun_ajaran = '${tahun_ajaran}' AND semester = '${semester}') AS prestasi
     FROM users u
-    WHERE u.user_type = 'siswa' AND u.tingkat_kelas = '${tingkat_kelas}') a
+    WHERE u.user_type = 'siswa' AND u.tingkat_kelas = '${tingkat_kelas}' ${user_id ? "AND u.id = " + user_id : ""}) a
     `,
       { type: QueryTypes.SELECT }
     );
@@ -86,7 +84,7 @@ async function viewDataPenerima(req, res) {
     // GET DATA BOBOT DAN BOBOT NILAI
     const bobot = await sequelize.query(
       `
-    SELECT LOWER(b.kode) AS kode, b.tipe_kriteria, b.bobot, MAX(bn.nilai) AS nilai_max, MIN(bn.nilai) AS nilai_min
+    SELECT LOWER(b.kode) AS kode, b.nama_kriteria, b.tipe_kriteria, b.bobot, MAX(bn.nilai) AS nilai_max, MIN(bn.nilai) AS nilai_min
     FROM bobot b 
     JOIN bobot_nilai bn ON bn.id_bobot = b.id
     GROUP BY b.kode, b.tipe_kriteria, b.bobot 
@@ -149,7 +147,49 @@ async function viewDataPenerima(req, res) {
       result = resultTemp;
     }
 
-    return res.status(200).json({ status: 200, message: "Berhasil Mendapatkan Data Penerima Bantuan", data: { data, attributes, result, ranking: hasilAkhir } });
+    // GET DATA TAMBAHAN
+    const findBobotNilai = await sequelize.query(
+      `
+    SELECT b.kode, b.nama_kriteria, bn.nama_nilai, bn.nilai
+    FROM bobot b 
+    JOIN bobot_nilai bn ON b.id = bn.id_bobot 
+    `,
+      { type: QueryTypes.SELECT }
+    );
+
+    let bobot_nilai = {};
+
+    for (const dataBobot of findBobotNilai) {
+      const pushedData = {
+        nama_kriteria: dataBobot.nama_kriteria,
+        nama_nilai: dataBobot.nama_nilai,
+        nilai: dataBobot.nilai,
+      };
+      if (bobot_nilai[dataBobot.kode] === undefined) {
+        bobot_nilai[dataBobot.kode] = [pushedData];
+      } else {
+        bobot_nilai[dataBobot.kode].push(pushedData);
+      }
+    }
+
+    return res.status(200).json({ status: 200, message: "Berhasil Mendapatkan Data Penerima Bantuan", data: { data, attributes, result, ranking: hasilAkhir, bobot_nilai } });
+  } catch (error) {
+    console.log(error);
+    return res.status(RES_INTERNAL_SERVER_ERROR.status).json(RES_INTERNAL_SERVER_ERROR);
+  }
+}
+
+async function getDetailPerhitungan(req, res) {
+  if (req.method.toUpperCase() !== "POST") {
+    return res.status(RES_METHOD_NOT_ALLOWED.status).json(RES_METHOD_NOT_ALLOWED);
+  }
+
+  const { semester, tahun_ajaran, tingkat_kelas, limit } = req.body;
+
+  try {
+    const bobot = await Bobot.findAll();
+
+    return res.status(200).json({ status: 200, message: "Berhasil Mendapatkan Data Detail Perhitungan", data: { bobot, table_penilaian: TABLE_PENILAIAN } });
   } catch (error) {
     console.log(error);
     return res.status(RES_INTERNAL_SERVER_ERROR.status).json(RES_INTERNAL_SERVER_ERROR);
@@ -173,6 +213,7 @@ export default async function handler(req, res) {
 
   const routes = {
     get: viewDataPenerima,
+    "get-detail-perhitungan": getDetailPerhitungan,
   };
 
   if (routes[api]) {

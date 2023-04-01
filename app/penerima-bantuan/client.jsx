@@ -5,7 +5,17 @@ import { useContext, useState } from "react";
 
 // Components
 import { Dropdown } from "primereact/dropdown";
+import { Dialog } from "primereact/dialog";
+import { Timeline } from "primereact/timeline";
+import { ScrollPanel } from "primereact/scrollpanel";
 import { getPenerima } from "@/services/penerimaBantuan";
+import { Button } from "primereact/button";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
+import { TabView, TabPanel } from "primereact/tabview";
+import { ColumnGroup } from "primereact/columngroup";
+import { Row } from "primereact/row";
+import { TABLE_PENILAIAN } from "@/services/constants";
 
 export default function PenerimaBantuan() {
   const { classNames, loading, toast } = useContext(AppContext);
@@ -15,6 +25,122 @@ export default function PenerimaBantuan() {
   const [tingkatKelas, setTingkatKelas] = useState("1");
   const [limit, setLimit] = useState(3);
   const [dataPenerima, setDataPenerima] = useState([]);
+  const [rawData, setRawData] = useState([]);
+  const [rawAttributes, setRawAttributes] = useState([]);
+  const [rawResult, setRawResult] = useState([]);
+  const [rawAkhir, setRawAkhir] = useState([]);
+
+  // Detail Penilaian
+  const [savedFilter, setSavedFilter] = useState({ semester, tahunAjaran, tingkatKelas, limit });
+  const [rawBobotNilai, setRawBobotNilai] = useState([]);
+  const [maximizedDialog, setMaximizedDialog] = useState(false);
+  const [dialogDetailPerhitunganVisibility, setDialogDetailPerhitunganVisibility] = useState(false);
+  const [visibleSidebarDetail, setVisibleSidebarDetail] = useState(false);
+  const [tipeDetail, setTipeDetail] = useState("");
+  const [flowPerhitungan, setFlowPerhitungan] = useState([
+    {
+      point_name: "Start",
+      point_icon: "",
+      title: "Proses Input Data",
+      data: [
+        {
+          title: "Input Data",
+          description: "Admin melakukan input data siswa berupa data diri, data keluarga, data absensi, dan data prestasi",
+        },
+      ],
+    },
+    {
+      point_name: "Ketentuan Keputusan",
+      point_icon: "",
+      title: "Data Kriteria, Bobot, dan Penilaian",
+      data: [
+        {
+          title: "Kriteria",
+          description: "Detail ketentuan Kriteria",
+          link_text: "Click to see details",
+          on_click: "table_kriteria",
+        },
+        {
+          title: "Bobot",
+          description: "Detail ketentuan Bobot",
+          link_text: "Click to see details",
+          on_click: "table_bobot",
+        },
+        {
+          title: "Penilaian",
+          description: "Detail ketentuan Penilaian",
+          link_text: "Click to see details",
+          on_click: "table_penilaian",
+        },
+      ],
+    },
+    {
+      point_name: "Konversi ke Poin",
+      point_icon: "",
+      title: "Mengkonversi data menjadi poin",
+      data: [
+        {
+          title: "Mengkonversi data menjadi poin",
+          description: "Melakukan konversi data siswa menjadi poin berdasarkan ketentuan pada Tabel Kriteria, Tabel Bobot, dan Tabel Penilaian",
+          link_text: "Click to see details",
+          on_click: "table_konversi_to_poin",
+        },
+      ],
+    },
+    {
+      point_name: "Konversi ke Matriks",
+      point_icon: "",
+      title: "Mengkonversi Poin ke Matriks",
+      data: [
+        {
+          title: "Mengkonversi Point ke Matriks",
+          description: "Melakukan konversi Poin yang diperoleh dari kode kriteria C1 sampai C6 menjadi bentuk matriks tahap 1 (Xij)",
+          link_text: "Click to see details",
+          on_click: "table_konversi_to_matriks",
+        },
+      ],
+    },
+    {
+      point_name: "Normalisasi Matriks",
+      point_icon: "",
+      title: "Normalisasi data Matriks",
+      data: [
+        {
+          title: "Normalisasi data Matriks",
+          description: "Melakukan Normalisasi pada data matriks berdasarkan tipe kriteria (Cost/Benefit)",
+          link_text: "Click to see details",
+          on_click: "table_normalisasi",
+        },
+      ],
+    },
+    {
+      point_name: "Perhitungan Akhir",
+      point_icon: "",
+      title: "Perhitungan Akhir",
+      data: [
+        {
+          title: "Perhitungan Akhir dari Normalisasi",
+          description: "Melakukan perhitungan penjumlahan hasil normalisasi kemudian mengurutkan data dengan nilai tertinggi ke terendah",
+          link_text: "Click to see details",
+          on_click: "table_perhitungan_akhir",
+        },
+      ],
+    },
+    {
+      point_name: "Selesai",
+      point_icon: "",
+      title: "Hasil Akhir",
+      data: [
+        {
+          title: "Data Penerima Bantuan",
+          description: "Sistem akan mengirimkan data penerima bantuan beserta nilai yang diperoleh",
+        },
+      ],
+    },
+  ]);
+
+  // Dialog Detail
+  const [titleDetail, setTitleDetail] = useState("");
 
   // Options
   const getTahunAjaran = () => {
@@ -31,23 +157,299 @@ export default function PenerimaBantuan() {
 
   const optionTahunAjaran = getTahunAjaran();
 
-  const getListPenerima = () => {
-    loading({ text: "Kami sedang mengkalkulasi penerima bantuan", visible: true });
-    getPenerima({ tingkat_kelas: tingkatKelas, semester, tahun_ajaran: tahunAjaran, first: 0, rows: limit })
+  const getListPenerima = (forDetail = false, user_id = null) => {
+    loading({ text: forDetail ? "Kami sedang mengambil detail perhitungan" : "Kami sedang mengkalkulasi penerima bantuan", visible: true });
+    getPenerima({ tingkat_kelas: tingkatKelas, semester, tahun_ajaran: tahunAjaran, first: 0, rows: limit !== "All" ? limit : 100, get_all: limit === "All", user_id: user_id || undefined })
       .then((res) => {
-        toast.current.show({ severity: res.status === 200 ? "success" : "warn", summary: res.status === 200 ? "Berhasil" : "Gagal", detail: res.message });
+        if (res.status === 200 && res.data.ranking.length < 1) {
+          setRawData([]);
+          setRawAttributes([]);
+          setRawResult([]);
+          setRawBobotNilai([]);
+          setDataPenerima([]);
+          setSavedFilter({ semester, tahunAjaran, tingkatKelas, limit });
+          return toast.current.show({ severity: "warn", summary: "Tidak Ditemukan", detail: user_id ? "Server bermasalah" : "Tidak dapat menemukan data dengan filter ini" });
+        }
+
+        if (forDetail === false) {
+          toast.current.show({ severity: res.status === 200 ? "success" : "warn", summary: res.status === 200 ? "Berhasil" : "Gagal", detail: res.message });
+        }
         if (res.status === 200) {
-          let dataTemp = [];
-          for (let i = 0; i < res.data.ranking.length; i++) {
-            dataTemp.push({
-              no: i + 1,
-              ...res.data.ranking[i],
-            });
+          if (forDetail === false) {
+            let dataTemp = [];
+            for (let i = 0; i < res.data.ranking.length; i++) {
+              dataTemp.push({
+                no: i + 1,
+                ...res.data.ranking[i],
+              });
+            }
+
+            setDataPenerima(dataTemp);
+            setSavedFilter({ semester, tahunAjaran, tingkatKelas, limit });
+          } else {
+            let dataTempAttributes = [];
+            for (const key of Object.keys(res.data.attributes)) {
+              dataTempAttributes.push(res.data.attributes[key]);
+            }
+
+            let dataTempResult = [];
+            let dataTempRawAkhir = [];
+            for (const { id, nilai } of res.data.ranking) {
+              let dataSiswa = res.data.data.find((item) => item.id === Number(id));
+
+              for (const detail of res.data.result[id]) {
+                let result = {};
+                let resultAkhir = {};
+                result.nama = dataSiswa.nama;
+                resultAkhir.nama = dataSiswa.nama;
+                resultAkhir.hasil = nilai;
+                for (const kode of Object.keys(detail)) {
+                  let dataAttribute = res.data.attributes[kode];
+                  result.xij = dataSiswa[kode];
+                  result.kode_kriteria = kode.toUpperCase();
+                  result.hasil = detail[kode].toFixed(3);
+                  result.tipe_kriteria = dataAttribute.tipe_kriteria;
+                  result.nilai_min = dataAttribute.nilai_min;
+                  result.nilai_max = dataAttribute.nilai_max;
+                  resultAkhir.kode_bobot = kode.toUpperCase();
+                  resultAkhir.rij = detail[kode].toFixed(3);
+                  resultAkhir.nilai_bobot = dataAttribute.bobot;
+                  resultAkhir.hasil_kali = (parseFloat(detail[kode]) * parseFloat(dataAttribute.bobot)).toFixed(3);
+                }
+                dataTempResult.push(result);
+                dataTempRawAkhir.push(resultAkhir);
+              }
+            }
+
+            setRawData(res.data.data);
+            setRawAkhir(dataTempRawAkhir);
+            setRawAttributes(dataTempAttributes);
+            setRawResult(dataTempResult);
+            setRawBobotNilai(res.data.bobot_nilai);
           }
-          setDataPenerima(dataTemp);
         }
       })
-      .finally(() => loading({ text: null, visible: false }));
+      .finally(() => {
+        loading({ text: null, visible: false });
+        if (forDetail === true) {
+          setDialogDetailPerhitunganVisibility(true);
+        }
+      });
+  };
+
+  // LAYOUT
+  const customizeMarker = (item) => {
+    return (
+      <div className="flex items-center gap-2 px-5 py-3 rounded-xl bg-slate-800">
+        <span className="text-white text-sm">{item.point_name}</span>
+        {item.point_icon && <i className={`${item.point_icon} text-white`}></i>}
+      </div>
+    );
+  };
+
+  const customizeContent = (item) => {
+    return (
+      <div className="py-3 px-5 mb-10 rounded-lg bg-blue-100 w-full min-h-[4rem] shadow-lg shadow-gray-200">
+        <span className="font-semibold">{item.title}</span>
+        <div className="flex flex-col gap-3 mt-3">
+          {(item.data || []).map((data, index) => {
+            return (
+              <div
+                key={index}
+                className={classNames("bg-white p-3 rounded-lg flex flex-col gap-2", {
+                  "cursor-pointer motion-safe:hover:scale-[1.02] hover:shadow-lg hover:shadow-blue-200": data.link_text && data.on_click,
+                })}
+                onClick={() => {
+                  if (!data.link_text && !data.on_click) return;
+                  setTitleDetail(data.title);
+                  setTipeDetail(data.on_click);
+                  setVisibleSidebarDetail(true);
+                }}
+              >
+                <span className="text-sm">{data.title}</span>
+                <span className="text-xs">{data.description}</span>
+                {data.link_text && data.on_click && <a className="text-xs text-blue-400">{data.link_text}</a>}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  const getDetailDataPerhitungan = () => {
+    if (tipeDetail === "table_kriteria") {
+      return (
+        <DataTable value={rawAttributes} size="small" showGridlines>
+          <Column field="kode" header="Kode" style={{ textAlign: "center" }} headerClassName="th-h-center" body={(e) => <span>{e.kode && e.kode.toUpperCase()}</span>} />
+          <Column field="nama_kriteria" header="Nama Kriteria" headerClassName="th-h-center" />
+          <Column field="tipe_kriteria" header="Tipe Kriteria" style={{ textAlign: "center" }} headerClassName="th-h-center" />
+        </DataTable>
+      );
+    } else if (tipeDetail === "table_penilaian") {
+      return (
+        <DataTable value={TABLE_PENILAIAN} size="small" showGridlines>
+          <Column field="keterangan" header="Keterangan" style={{ textAlign: "center" }} headerClassName="th-h-center" />
+          <Column field="nilai" header="Nilai" style={{ textAlign: "center" }} headerClassName="th-h-center" />
+        </DataTable>
+      );
+    } else if (tipeDetail === "table_bobot") {
+      return (
+        <div>
+          <div className="font-medium mb-2">Master Data</div>
+          <DataTable value={rawAttributes} size="small" showGridlines>
+            <Column field="kode" header="Kode" style={{ textAlign: "center" }} headerClassName="th-h-center" body={(e) => <span>{e.kode && e.kode.toUpperCase()}</span>} />
+            <Column field="nama_kriteria" header="Nama Kriteria" headerClassName="th-h-center" />
+            <Column field="bobot" header="Bobot" style={{ textAlign: "center" }} headerClassName="th-h-center" />
+            <Column field="nilai_min" header="Nilai Min" style={{ textAlign: "center" }} headerClassName="th-h-center" />
+            <Column field="nilai_max" header="Nilai Max" style={{ textAlign: "center" }} headerClassName="th-h-center" />
+          </DataTable>
+          <div className="font-medium mt-6 mb-2">Detail Kriteria Bobot</div>
+          <TabView>
+            {rawAttributes.map((item, i) => (
+              <TabPanel key={i} header={item.kode?.toUpperCase()}>
+                <div className="mb-3">
+                  Nama Kriteria : <span className="font-medium">{item.nama_kriteria}</span>
+                </div>
+                <DataTable value={rawBobotNilai[item.kode?.toUpperCase()]} size="small" showGridlines>
+                  <Column field="nama_nilai" header="Nama Nilai" headerClassName="th-h-center" />
+                  <Column field="nilai" header="Nilai" style={{ textAlign: "center" }} headerClassName="th-h-center" />
+                </DataTable>
+              </TabPanel>
+            ))}
+          </TabView>
+        </div>
+      );
+    } else if (tipeDetail === "table_konversi_to_poin") {
+      const columnGroup = (
+        <ColumnGroup>
+          <Row>
+            <Column header="Nama Siswa" rowSpan={2} headerClassName="th-h-center" />
+            <Column header="Hasil Konversi Penilaian" colSpan={6} headerClassName="th-h-center" />
+          </Row>
+          <Row>
+            <Column header="C1" headerClassName="th-h-center" />
+            <Column header="C2" headerClassName="th-h-center" />
+            <Column header="C3" headerClassName="th-h-center" />
+            <Column header="C4" headerClassName="th-h-center" />
+            <Column header="C5" headerClassName="th-h-center" />
+            <Column header="C6" headerClassName="th-h-center" />
+          </Row>
+        </ColumnGroup>
+      );
+      return (
+        <>
+          <div className="italic mb-3">"detail data masing masing siswa dikonversi menjadi poin penilaian yang ditentukan berdasarkan ketentuan kriteria dan bobot"</div>
+          <DataTable value={rawData} size="small" showGridlines headerColumnGroup={columnGroup}>
+            <Column field="nama" header="Nama Siswa" />
+            <Column field="c1" header="C1" style={{ textAlign: "center" }} />
+            <Column field="c2" header="C2" style={{ textAlign: "center" }} />
+            <Column field="c3" header="C3" style={{ textAlign: "center" }} />
+            <Column field="c4" header="C4" style={{ textAlign: "center" }} />
+            <Column field="c5" header="C5" style={{ textAlign: "center" }} />
+            <Column field="c6" header="C6" style={{ textAlign: "center" }} />
+          </DataTable>
+        </>
+      );
+    } else if (tipeDetail === "table_konversi_to_matriks") {
+      const columnGroup = (
+        <ColumnGroup>
+          <Row>
+            <Column header="Nama Siswa" rowSpan={2} headerClassName="th-h-center" />
+            <Column header="Xij" colSpan={6} headerClassName="th-h-center" />
+          </Row>
+          <Row>
+            <Column header="C1" headerClassName="th-h-center" />
+            <Column header="C2" headerClassName="th-h-center" />
+            <Column header="C3" headerClassName="th-h-center" />
+            <Column header="C4" headerClassName="th-h-center" />
+            <Column header="C5" headerClassName="th-h-center" />
+            <Column header="C6" headerClassName="th-h-center" />
+          </Row>
+        </ColumnGroup>
+      );
+      return (
+        <>
+          <div className="italic mb-3">
+            "poin penilaian dirubah menjadi <span className="font-medium not-italic">Xij</span> sebelum dinormalisasi dan dilakukan perhitungan"
+          </div>
+          <DataTable value={rawData} size="small" showGridlines headerColumnGroup={columnGroup}>
+            <Column field="nama" header="Nama Siswa" />
+            <Column field="c1" header="C1" style={{ textAlign: "center" }} />
+            <Column field="c2" header="C2" style={{ textAlign: "center" }} />
+            <Column field="c3" header="C3" style={{ textAlign: "center" }} />
+            <Column field="c4" header="C4" style={{ textAlign: "center" }} />
+            <Column field="c5" header="C5" style={{ textAlign: "center" }} />
+            <Column field="c6" header="C6" style={{ textAlign: "center" }} />
+          </DataTable>
+        </>
+      );
+    } else if (tipeDetail === "table_normalisasi") {
+      const rumusTemplate = (data) => {
+        if (data.tipe_kriteria.toLowerCase() === "benefit") {
+          return <span className="italic">xij/nilai max</span>;
+        } else {
+          return <span className="italic">nilai min/xij</span>;
+        }
+      };
+
+      return (
+        <>
+          <div className="italic mb-3">"Menentukan Hasil Normalisasi dengan perhitungan berdasarkan rumus yang ditentukan (Cost/Benefit)""</div>
+          <DataTable
+            value={rawResult}
+            size="small"
+            showGridlines
+            rowGroupMode="rowspan"
+            groupRowsBy="nama"
+            sortMode="single"
+            sortField="name"
+            sortOrder={1}
+            scrollable
+            scrollHeight={maximizedDialog ? "650px" : "500px"}
+          >
+            <Column field="nama" header="Nama Siswa" />
+            <Column field="kode_kriteria" header="Kode Kriteria" style={{ textAlign: "center" }} />
+            <Column field="tipe_kriteria" header="Tipe Kriteria" style={{ textAlign: "center" }} />
+            <Column field="xij" header="Xij" style={{ textAlign: "center" }} />
+            <Column field="nilai_min" header="Nilai Min" style={{ textAlign: "center" }} />
+            <Column field="nilai_max" header="Nilai Max" style={{ textAlign: "center" }} />
+            <Column field="rumus" header="Rumus" style={{ textAlign: "center" }} body={rumusTemplate} />
+            <Column field="hasil" header="Hasil (rij)" style={{ textAlign: "center" }} />
+          </DataTable>
+        </>
+      );
+    } else if (tipeDetail === "table_perhitungan_akhir") {
+      const hasilTemplate = (data) => {
+        return <span>{data.hasil}</span>;
+      };
+      return (
+        <>
+          <div className="italic mb-3">"Menentukan Hasil Normalisasi dengan perhitungan berdasarkan rumus yang ditentukan (Cost/Benefit)""</div>
+          <DataTable
+            value={rawAkhir}
+            size="small"
+            showGridlines
+            rowGroupMode="rowspan"
+            groupRowsBy="nama"
+            sortMode="single"
+            sortField="name"
+            sortOrder={1}
+            scrollable
+            scrollHeight={maximizedDialog ? "650px" : "500px"}
+          >
+            <Column field="nama" header="Nama Siswa" />
+            <Column field="kode_bobot" header="Kode Bobot" style={{ textAlign: "center" }} />
+            <Column field="rij" header="Nilai (rij)" style={{ textAlign: "center" }} />
+            <Column field="nilai_bobot" header="Nilai Bobot" style={{ textAlign: "center" }} />
+            <Column field="hasil_kali" header="rij x Nilai Bobot (R)" style={{ textAlign: "center" }} />
+            <Column field="nama" header="Hasil (R1 + R2 + ...RN)" style={{ textAlign: "center" }} body={hasilTemplate} />
+          </DataTable>
+        </>
+      );
+    } else {
+      return <div>data tidak ditemukan</div>;
+    }
   };
 
   return (
@@ -130,13 +532,14 @@ export default function PenerimaBantuan() {
                 { label: 10, value: 10 },
                 { label: 20, value: 20 },
                 { label: 40, value: 40 },
+                { label: "All", value: "All" },
               ]}
               placeholder="limit"
               className="p-inputtext-sm w-24"
             />
           </div>
           <button
-            onClick={getListPenerima}
+            onClick={() => getListPenerima()}
             type="submit"
             className="h-11 flex items-center gap-3 bg-[#2293EE] py-2 px-4 rounded-lg hover:bg-[#4da5ed] active:scale-[0.97] focus:ring focus:ring-blue-200"
           >
@@ -154,7 +557,11 @@ export default function PenerimaBantuan() {
             <span className="text-sm text-gray-500">daftar penerima bantuan yang terlampir dibawah ini telah dikalkulasikan secara valid dengan perhitungan Simple Additive Weighting</span>
           </div>
           {dataPenerima.length > 0 && (
-            <button type="submit" className="flex items-center h-fit gap-3 bg-[#2293EE] py-2 px-4 rounded-lg hover:bg-[#4da5ed] active:scale-[0.97] focus:ring focus:ring-blue-200">
+            <button
+              onClick={() => getListPenerima(true)}
+              type="submit"
+              className="flex items-center h-fit gap-3 bg-[#2293EE] py-2 px-4 rounded-lg hover:bg-[#4da5ed] active:scale-[0.97] focus:ring focus:ring-blue-200"
+            >
               <span className="text-xs font-medium text-white">Lihat Detail Perhitungan</span>
             </button>
           )}
@@ -198,13 +605,71 @@ export default function PenerimaBantuan() {
               <span className="font-medium">{item.nilai}</span>
             </div>
             <div className="col-span-1 flex items-center justify-end">
-              <button type="submit" className="flex items-center gap-3 bg-[#2293EE] py-2 px-4 rounded-lg hover:bg-[#4da5ed] active:scale-[0.97] focus:ring focus:ring-blue-200">
+              <button
+                onClick={() => getListPenerima(true, item.id)}
+                type="submit"
+                className="flex items-center gap-3 bg-[#2293EE] py-2 px-4 rounded-lg hover:bg-[#4da5ed] active:scale-[0.97] focus:ring focus:ring-blue-200"
+              >
                 <span className="text-[0.6rem] font-medium text-white">Lihat Detail</span>
               </button>
             </div>
           </div>
         ))}
       </div>
+      <Dialog
+        header="Detail Perhitungan Simple Additive Weighting"
+        visible={dialogDetailPerhitunganVisibility}
+        onHide={() => {
+          setTipeDetail("");
+          setVisibleSidebarDetail(false);
+          setMaximizedDialog(false);
+          setDialogDetailPerhitunganVisibility(false);
+        }}
+        className="w-11/12 h-5/6 rounded-2xl"
+        headerClassName="dialog-header-penilaian"
+        contentClassName="dialog-content-penilaian"
+        breakpoints={{ "960px": "75vw", "641px": "100vw" }}
+        maximizable
+        maximized={maximizedDialog}
+        onMaximize={(e) => {
+          setMaximizedDialog(e.maximized);
+        }}
+      >
+        <div className="pt-4 relative">
+          <div className="p-5">
+            <Timeline value={flowPerhitungan} align="alternate" className="flow" marker={customizeMarker} content={customizeContent} />
+          </div>
+          {visibleSidebarDetail && (
+            <div className="absolute top-0 left-0 right-0 w-full h-full grid grid-cols-12">
+              <div
+                className="bg-slate-800/10 col-span-7"
+                onClick={() => {
+                  setTipeDetail("");
+                  setVisibleSidebarDetail(false);
+                }}
+              ></div>
+              <div className="bg-white col-span-5 relative">
+                <div className={classNames("p-4 fixed", { "w-[37vw]": !maximizedDialog, "w-[41vw]": maximizedDialog })}>
+                  <div className="flex gap-4 items-center">
+                    <Button
+                      icon="pi pi-times"
+                      rounded
+                      text
+                      aria-label="Close"
+                      onClick={() => {
+                        setTipeDetail("");
+                        setVisibleSidebarDetail(false);
+                      }}
+                    />
+                    <p className="font-medium">{titleDetail}</p>
+                  </div>
+                  <ScrollPanel className={classNames({ "h-[64vh] pl-2 pt-2": !maximizedDialog, "h-[85vh]": maximizedDialog })}>{getDetailDataPerhitungan()}</ScrollPanel>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </Dialog>
     </>
   );
 }
