@@ -220,9 +220,9 @@ async function getCountSiswa(req, res) {
   }
 
   try {
-    const user = await sequelize.query(`SELECT COUNT(*) AS count FROM users WHERE user_type = 'siswa'`, { type: QueryTypes.SELECT });
+    const user = await sequelize.query(`SELECT COUNT(*) AS count, MAX(created_date) AS last_updated FROM users WHERE user_type = 'siswa' ORDER BY created_date DESC`, { type: QueryTypes.SELECT });
 
-    return res.status(200).json({ status: 200, message: "Berhasil Mendapatkan User", data: user[0].count });
+    return res.status(200).json({ status: 200, message: "Berhasil Mendapatkan User", data: user[0] });
   } catch (error) {
     console.log(error);
     return res.status(RES_INTERNAL_SERVER_ERROR.status).json(RES_INTERNAL_SERVER_ERROR);

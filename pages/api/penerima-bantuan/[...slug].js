@@ -172,7 +172,11 @@ async function viewDataPenerima(req, res) {
       }
     }
 
-    return res.status(200).json({ status: 200, message: "Berhasil Mendapatkan Data Penerima Bantuan", data: { data, attributes, result, ranking: hasilAkhir, bobot_nilai } });
+    const lastUpdated = await sequelize.query(`SELECT MAX(updated_date) AS last_updated FROM users WHERE user_type = 'siswa' ORDER BY updated_date DESC`, { type: QueryTypes.SELECT });
+
+    return res
+      .status(200)
+      .json({ status: 200, message: "Berhasil Mendapatkan Data Penerima Bantuan", data: { data, attributes, result, ranking: hasilAkhir, bobot_nilai, last_updated: lastUpdated[0].last_updated } });
   } catch (error) {
     console.log(error);
     return res.status(RES_INTERNAL_SERVER_ERROR.status).json(RES_INTERNAL_SERVER_ERROR);

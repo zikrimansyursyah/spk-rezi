@@ -5,20 +5,24 @@ import Image from "next/image";
 import Link from "next/link";
 import { getTotalSiswa } from "@/services/user";
 import { getPenerima } from "@/services/penerimaBantuan";
+import { Skeleton } from "primereact/skeleton";
 
 export default function Dashboard() {
   const { access_token } = useContext(AppContext);
   const [totalSiswa, setTotalSiswa] = useState(0);
+  const [lastUpdateSiswa, setLastUpdateSiswa] = useState("");
   const [dataPenerima, setDataPenerima] = useState([]);
+  const [lastUpdatePenerima, setLastUpdatePenerima] = useState("");
 
   const getTotal = () => {
     getTotalSiswa().then((res) => {
-      setTotalSiswa(res.data);
+      setLastUpdateSiswa(new Date(res.data.last_updated).toLocaleDateString());
+      setTotalSiswa(res.data.count);
     });
   };
 
   const getDataPenerimaBantuan = () => {
-    getPenerima({ tingkat_kelas: "6", semester: "ganjil", tahun_ajaran: "2022/2023", first: 0, rows: 5 }).then((res) => {
+    getPenerima({ tingkat_kelas: "6", semester: "ganjil", tahun_ajaran: `${new Date().getFullYear() - 1}/${new Date().getFullYear()}`, first: 0, rows: 5 }).then((res) => {
       if (res.status === 200) {
         let dataTemp = [];
         for (let i = 0; i < res.data.ranking.length; i++) {
@@ -27,6 +31,8 @@ export default function Dashboard() {
             ...res.data.ranking[i],
           });
         }
+
+        setLastUpdatePenerima(new Date(res.data.last_updated).toLocaleDateString());
         setDataPenerima(dataTemp);
       }
     });
@@ -63,7 +69,7 @@ export default function Dashboard() {
           <div className="flex justify-center mt-32 text-sm text-gray-500">Copyright &copy; Ahmad Fahrezi - 2023</div>
         </div>
         <div className="col-span-4 flex flex-col gap-10">
-          <div className="w-full h-48 bg-blue-500 border rounded-lg hover:shadow-lg hover:shadow-gray-200 hover:border-blue-400 p-5 flex flex-col justify-between">
+          {/* <div className="w-full h-48 bg-blue-500 border rounded-lg hover:shadow-lg hover:shadow-gray-200 hover:border-blue-400 p-5 flex flex-col justify-between">
             <div className="flex justify-between items-center">
               <h3 className="font-medium text-white">Total Dana Dikelola</h3>
               <Link href="/penerima-bantuan" className="w-7 h-7 flex justify-center items-center rounded-md hover:bg-gray-100 hover:shadow-sm group">
@@ -72,15 +78,21 @@ export default function Dashboard() {
             </div>
             <div className="text-5xl font-medium text-white">Rp. 1.722.500</div>
             <div className="text-xs text-white">Terakhir diupdate : 22 Februari 2023</div>
-          </div>
+          </div> */}
           <div className="w-full bg-white border rounded-lg hover:shadow-lg hover:shadow-gray-200 hover:border-blue-400 p-5 flex flex-col gap-4 justify-between">
             <div className="flex justify-between items-center">
-              <h3 className="font-medium">Penerima Dana Terbaru {new Date().getFullYear()}</h3>
+              <h3 className="font-medium">Penerima Dana Terbaru {`${new Date().getFullYear() - 1}/${new Date().getFullYear()}`}</h3>
               <Link href="/penerima-bantuan" className="w-7 h-7 flex justify-center items-center rounded-md hover:bg-gray-100 hover:shadow-sm">
                 <i className="pi pi-external-link"></i>
               </Link>
             </div>
-            {dataPenerima.length === 0 && <div>tidak ada data</div>}
+            {dataPenerima.length === 0 && (
+              <div className="flex flex-col gap-3">
+                <Skeleton width="17rem" height="3rem" />
+                <Skeleton width="17rem" height="3rem" />
+                <Skeleton width="17rem" height="3rem" />
+              </div>
+            )}
             {(dataPenerima || []).map((item, index) => (
               <div key={index} className="flex flex-col gap-2">
                 <div className="grid grid-cols-3 p-2 border rounded hover:bg-blue-400 group hover:shadow-sm">
@@ -89,7 +101,7 @@ export default function Dashboard() {
                 </div>
               </div>
             ))}
-            <div className="text-xs">Terakhir diupdate : hari ini</div>
+            <div className="text-xs flex items-center gap-2">Terakhir diupdate : {lastUpdatePenerima || <Skeleton width="8rem" height="1rem" />}</div>
           </div>
           <div className="w-full h-48 bg-white border rounded-lg hover:shadow-lg hover:shadow-gray-200 hover:border-blue-400 p-5 flex flex-col justify-between">
             <div className="flex justify-between items-center">
@@ -100,10 +112,14 @@ export default function Dashboard() {
                 </Link>
               )}
             </div>
-            <div className="text-6xl font-medium">
-              {totalSiswa} <span className="text-4xl">Siswa</span>
-            </div>
-            <div className="text-xs">Terakhir diupdate : 22 Februari 2023</div>
+            {totalSiswa ? (
+              <div className="text-6xl font-medium">
+                {totalSiswa} <span className="text-4xl">Siswa</span>
+              </div>
+            ) : (
+              <Skeleton width="15rem" height="5rem" />
+            )}
+            <div className="text-xs flex items-center gap-2">Terakhir diupdate : {lastUpdateSiswa ? lastUpdateSiswa : <Skeleton width="8rem" height="1rem" />}</div>
           </div>
         </div>
       </div>
