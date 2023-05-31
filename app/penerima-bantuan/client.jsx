@@ -285,7 +285,7 @@ export default function PenerimaBantuan() {
   const getDetailDataPerhitungan = () => {
     if (tipeDetail === "table_kriteria") {
       return (
-        <DataTable value={rawAttributes} size="small" showGridlines>
+        <DataTable value={rawAttributes} size="small" showGridlines responsiveLayout="stack" breakpoint="940px">
           <Column field="kode" header="Kode" style={{ textAlign: "center" }} headerClassName="th-h-center" body={(e) => <span>{e.kode && e.kode.toUpperCase()}</span>} />
           <Column field="nama_kriteria" header="Nama Kriteria" headerClassName="th-h-center" />
           <Column field="tipe_kriteria" header="Tipe Kriteria" style={{ textAlign: "center" }} headerClassName="th-h-center" />
@@ -293,7 +293,7 @@ export default function PenerimaBantuan() {
       );
     } else if (tipeDetail === "table_penilaian") {
       return (
-        <DataTable value={TABLE_PENILAIAN} size="small" showGridlines>
+        <DataTable value={TABLE_PENILAIAN} size="small" showGridlines responsiveLayout="stack" breakpoint="940px">
           <Column field="keterangan" header="Keterangan" style={{ textAlign: "center" }} headerClassName="th-h-center" />
           <Column field="nilai" header="Nilai" style={{ textAlign: "center" }} headerClassName="th-h-center" />
         </DataTable>
@@ -302,7 +302,7 @@ export default function PenerimaBantuan() {
       return (
         <div>
           <div className="font-medium mb-2">Master Data</div>
-          <DataTable value={rawAttributes} size="small" showGridlines>
+          <DataTable value={rawAttributes} size="small" showGridlines responsiveLayout="stack" breakpoint="940px">
             <Column field="kode" header="Kode" style={{ textAlign: "center" }} headerClassName="th-h-center" body={(e) => <span>{e.kode && e.kode.toUpperCase()}</span>} />
             <Column field="nama_kriteria" header="Nama Kriteria" headerClassName="th-h-center" />
             <Column field="bobot" header="Bobot" style={{ textAlign: "center" }} headerClassName="th-h-center" />
@@ -316,7 +316,7 @@ export default function PenerimaBantuan() {
                 <div className="mb-3">
                   Nama Kriteria : <span className="font-medium">{item.nama_kriteria}</span>
                 </div>
-                <DataTable value={rawBobotNilai[item.kode?.toUpperCase()]} size="small" showGridlines>
+                <DataTable value={rawBobotNilai[item.kode?.toUpperCase()]} size="small" showGridlines responsiveLayout="stack" breakpoint="940px">
                   <Column field="nama_nilai" header="Nama Nilai" headerClassName="th-h-center" />
                   <Column field="nilai" header="Nilai" style={{ textAlign: "center" }} headerClassName="th-h-center" />
                 </DataTable>
@@ -345,7 +345,7 @@ export default function PenerimaBantuan() {
       return (
         <>
           <div className="italic mb-3">"detail data masing masing siswa dikonversi menjadi poin penilaian yang ditentukan berdasarkan ketentuan kriteria dan bobot"</div>
-          <DataTable value={rawData} size="small" showGridlines headerColumnGroup={columnGroup}>
+          <DataTable value={rawData} size="small" showGridlines headerColumnGroup={columnGroup} responsiveLayout="stack" breakpoint="940px">
             <Column field="nama" header="Nama Siswa" />
             <Column field="c1" header="C1" style={{ textAlign: "center" }} />
             <Column field="c2" header="C2" style={{ textAlign: "center" }} />
@@ -378,7 +378,7 @@ export default function PenerimaBantuan() {
           <div className="italic mb-3">
             "poin penilaian dirubah menjadi <span className="font-medium not-italic">Xij</span> sebelum dinormalisasi dan dilakukan perhitungan"
           </div>
-          <DataTable value={rawData} size="small" showGridlines headerColumnGroup={columnGroup}>
+          <DataTable value={rawData} size="small" showGridlines headerColumnGroup={columnGroup} responsiveLayout="stack" breakpoint="940px">
             <Column field="nama" header="Nama Siswa" />
             <Column field="c1" header="C1" style={{ textAlign: "center" }} />
             <Column field="c2" header="C2" style={{ textAlign: "center" }} />
@@ -412,6 +412,7 @@ export default function PenerimaBantuan() {
             sortOrder={1}
             scrollable
             scrollHeight={maximizedDialog ? "650px" : "500px"}
+            responsiveLayout="stack" breakpoint="940px"
           >
             <Column field="nama" header="Nama Siswa" />
             <Column field="kode_kriteria" header="Kode Kriteria" style={{ textAlign: "center" }} />
@@ -440,8 +441,9 @@ export default function PenerimaBantuan() {
             sortMode="single"
             sortField="name"
             sortOrder={1}
-            scrollable
-            scrollHeight={maximizedDialog ? "650px" : "500px"}
+            // scrollable
+            // scrollHeight={maximizedDialog ? "650px" : "500px"}
+            responsiveLayout="stack" breakpoint="940px"
           >
             <Column field="nama" header="Nama Siswa" />
             <Column field="kode_bobot" header="Kode Bobot" style={{ textAlign: "center" }} />
@@ -459,16 +461,16 @@ export default function PenerimaBantuan() {
 
   return (
     <>
-      <div className="p-4 flex fixed w-full justify-between items-center bg-white border-b shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.02)] z-50">
-        <div className="flex gap-3">
+      <div className="p-4 pl-20 md:pl-4 fixed w-full grid grid-cols-12 gap-4 bg-white border-b shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.02)] z-50">
+        <div className="col-span-12 md:col-span-5 lg:col-span-4 flex gap-3">
           <div className="w-1 h-12 bg-sky-500 rounded-full"></div>
           <div className="flex flex-col">
             <span className="font-semibold">Penerima Bantuan</span>
             <span className="text-sm text-gray-600">Data Siswa Penerima Bantuan Kesejahteraan</span>
           </div>
         </div>
-        <div className="flex gap-4 items-end">
-          <div className="flex flex-col gap-1">
+        <div className="col-span-12 md:col-span-7 lg:col-span-8 grid grid-cols-12 gap-4">
+          <div className="col-span-4 sm:col-span-2 md:col-span-3 lg:col-span-2 flex flex-col gap-1">
             <label htmlFor="tingkat_kelas" className="text-sm">
               Tingkat Kelas
             </label>
@@ -491,7 +493,7 @@ export default function PenerimaBantuan() {
               className={classNames({ "p-inputtext-sm": true })}
             />
           </div>
-          <div className="flex flex-col gap-1">
+          <div className="col-span-8 sm:col-span-4 md:col-span-4 lg:col-span-3 flex flex-col gap-1">
             <label htmlFor="semester_filter" className="text-sm">
               Semester
             </label>
@@ -505,10 +507,10 @@ export default function PenerimaBantuan() {
                 { label: "Genap", value: "genap" },
               ]}
               placeholder="semester"
-              className="p-inputtext-sm w-40"
+              className="p-inputtext-sm"
             />
           </div>
-          <div className="flex flex-col gap-1">
+          <div className="col-span-8 sm:col-span-4 md:col-span-5 lg:col-span-3 flex flex-col gap-1">
             <label htmlFor="tahun_ajaran_filter" className="text-sm">
               Tahun Ajaran
             </label>
@@ -519,10 +521,10 @@ export default function PenerimaBantuan() {
               onChange={(e) => setTahunAjaran(e.target.value)}
               options={optionTahunAjaran}
               placeholder="tahun ajaran"
-              className="p-inputtext-sm w-26"
+              className="p-inputtext-sm"
             />
           </div>
-          <div className="flex flex-col gap-1">
+          <div className="col-span-4 sm:col-span-2 md:col-span-2 lg:col-span-2 flex flex-col gap-1">
             <label htmlFor="limit" className="text-sm">
               Limit
             </label>
@@ -540,35 +542,39 @@ export default function PenerimaBantuan() {
                 { label: "All", value: "All" },
               ]}
               placeholder="limit"
-              className="p-inputtext-sm w-24"
+              className="p-inputtext-sm"
             />
           </div>
-          <button
-            onClick={() => getListPenerima()}
-            type="submit"
-            className="h-11 flex items-center gap-3 bg-[#2293EE] py-2 px-4 rounded-lg hover:bg-[#4da5ed] active:scale-[0.97] focus:ring focus:ring-blue-200"
-          >
-            <i className="pi pi-search text-white text-xs font-medium"></i>
-            <span className="text-sm font-medium text-white">Tentukan</span>
-          </button>
+          <div className="col-span-12 md:col-span-2 lg:col-span-2 flex items-end">
+            <button
+              onClick={() => getListPenerima()}
+              type="submit"
+              className="lg:w-full h-11 flex items-center justify-center gap-3 bg-[#2293EE] py-2 px-4 rounded-lg hover:bg-[#4da5ed] active:scale-[0.97] focus:ring focus:ring-blue-200"
+            >
+              <i className="pi pi-search text-white text-xs font-medium"></i>
+              <span className="text-sm font-medium text-white">Tentukan</span>
+            </button>
+          </div>
         </div>
       </div>
-      <div className="px-4 pb-4 pt-32">
-        <div className="bg-white w-full rounded-lg border shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.001)] flex justify-between items-center p-4">
-          <div className="flex flex-col gap-1">
+      <div className="px-4 pb-4 pt-[22rem] sm:pt-[16rem] md:pt-[12rem] lg:pt-28">
+        <div className="bg-white w-full rounded-lg border shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.001)] grid grid-cols-12 gap-4 p-4">
+          <div className="col-span-12 md:col-span-9 flex flex-col gap-1">
             <span className="text-lg font-medium">
               Daftar Penerima Bantuan Periode {tahunAjaran} Semester {semester.slice(0, 1).toUpperCase() + semester.slice(1)}
             </span>
             <span className="text-sm text-gray-500">daftar penerima bantuan yang terlampir dibawah ini telah dikalkulasikan secara valid dengan perhitungan Simple Additive Weighting</span>
           </div>
           {dataPenerima.length > 0 && (
-            <button
-              onClick={() => getListPenerima(true)}
-              type="submit"
-              className="flex items-center h-fit gap-3 bg-[#2293EE] py-2 px-4 rounded-lg hover:bg-[#4da5ed] active:scale-[0.97] focus:ring focus:ring-blue-200"
-            >
-              <span className="text-xs font-medium text-white">Lihat Detail Perhitungan</span>
-            </button>
+            <div className="col-span-12 md:col-span-3 flex items-center justify-end">
+              <button
+                onClick={() => getListPenerima(true)}
+                type="submit"
+                className="flex items-center h-fit gap-3 bg-[#2293EE] py-2 px-4 rounded-lg hover:bg-[#4da5ed] active:scale-[0.97] focus:ring focus:ring-blue-200"
+              >
+                <span className="text-xs font-medium text-white">Lihat Detail Perhitungan</span>
+              </button>
+            </div>
           )}
         </div>
         {dataPenerima.length === 0 && (
@@ -580,36 +586,36 @@ export default function PenerimaBantuan() {
           </div>
         )}
       </div>
-      <div className="px-4 flex flex-col gap-4">
+      <div className="px-4 pb-10 flex flex-col gap-4">
         {(dataPenerima || []).map((item, index) => (
           <div
             key={index}
             className="p-6 bg-white w-full rounded-lg border shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.001)] grid grid-cols-12 gap-4 hover:shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.1)] hover:border-blue-400"
           >
-            <div className="col-span-1 flex items-center">
+            <div className="col-span-2 md:col-span-1 flex items-center">
               <span className="font-medium text-lg pr-8 border-r-2 border-blue-400">{item.no}</span>
             </div>
-            <div className="col-span-3 flex flex-col gap-1">
+            <div className="col-span-10 md:col-span-3 flex flex-col gap-1">
               <span className="text-xs text-gray-500">Nama Lengkap</span>
               <span className="font-medium">{item.nama}</span>
             </div>
-            <div className="col-span-2 flex flex-col gap-1">
+            <div className="col-span-12 md:col-span-2 flex flex-col gap-1">
               <span className="text-xs text-gray-500">Nomor Induk Sekolah</span>
               <span className="font-medium">{item.no_induk_sekolah}</span>
             </div>
-            <div className="col-span-2 flex flex-col gap-1">
+            <div className="col-span-6 sm:col-span-4 md:col-span-2 flex flex-col gap-1">
               <span className="text-xs text-gray-500">Nama Ayah</span>
               <span className="font-medium">{item.nama_ayah}</span>
             </div>
-            <div className="col-span-2 flex flex-col gap-1">
+            <div className="col-span-6 sm:col-span-4 md:col-span-2 flex flex-col gap-1">
               <span className="text-xs text-gray-500">Nama Ibu</span>
               <span className="font-medium">{item.nama_ibu}</span>
             </div>
-            <div className="col-span-1 flex flex-col gap-1">
+            <div className="col-span-6 sm:col-span-4 md:col-span-1 flex flex-col gap-1">
               <span className="text-xs text-gray-500">Nilai</span>
               <span className="font-medium">{item.nilai}</span>
             </div>
-            <div className="col-span-1 flex items-center justify-end">
+            <div className="col-span-6 sm:col-span-12 md:col-span-1 flex items-center justify-end sm:justify-start md:justify-end">
               <button
                 onClick={() => getListPenerima(true, item.id)}
                 type="submit"
@@ -633,7 +639,7 @@ export default function PenerimaBantuan() {
         className="w-11/12 h-5/6 rounded-2xl"
         headerClassName="dialog-header-penilaian"
         contentClassName="dialog-content-penilaian"
-        breakpoints={{ "960px": "75vw", "641px": "100vw" }}
+        breakpoints={{ "1024": "75vw", "960px": "95vw", "641px": "100vw" }}
         maximizable
         maximized={maximizedDialog}
         onMaximize={(e) => {
@@ -647,14 +653,14 @@ export default function PenerimaBantuan() {
           {visibleSidebarDetail && (
             <div className="absolute top-0 left-0 right-0 w-full h-full grid grid-cols-12">
               <div
-                className="bg-slate-800/10 col-span-7"
+                className="bg-slate-800/10 hidden md:block md:col-span-7"
                 onClick={() => {
                   setTipeDetail("");
                   setVisibleSidebarDetail(false);
                 }}
               ></div>
-              <div className="bg-white col-span-5 relative">
-                <div className={classNames("p-4 fixed", { "w-[37vw]": !maximizedDialog, "w-[41vw]": maximizedDialog })}>
+              <div className="bg-white col-span-12 md:col-span-5 relative">
+                <div className={classNames("p-4 fixed", { "w-screen md:w-[37vw]": !maximizedDialog, "w-screen md:w-[41vw]": maximizedDialog })}>
                   <div className="flex gap-4 items-center">
                     <Button
                       icon="pi pi-times"

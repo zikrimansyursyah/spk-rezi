@@ -109,7 +109,7 @@ export default function Client() {
             </div>
             <Button label="Login" type="submit" className="p-button-sm bg-[var(--primary-color)]" loading={loading} loadingIcon="pi pi-spin pi-spinner" iconPos="right" />
           </form>
-          <footer className="text-sm">Copyright</footer>
+          <footer className="text-sm">Copyright SDN Pakulonan Barat 2</footer>
         </div>
       </div>
     </div>

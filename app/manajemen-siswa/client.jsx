@@ -140,22 +140,22 @@ export default function ManajemenSiswa() {
 
   return (
     <div>
-      <div className="p-4 flex fixed w-full justify-between items-center bg-white border-b shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.02)] z-50">
-        <div className="flex gap-3">
+      <div className="p-4 pl-20 md:pl-4 fixed w-full grid grid-cols-2 gap-4 bg-white border-b shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.02)] z-50">
+        <div className="col-span-2 md:col-span-1 flex gap-3">
           <div className="w-1 h-12 bg-sky-500 rounded-full"></div>
           <div className="flex flex-col">
             <span className="font-semibold">Manajemen User</span>
             <span className="text-sm text-gray-600">Mengelola data siswa di SD Negeri 02 Pakulonan Barat</span>
           </div>
         </div>
-        <Link href="/manajemen-siswa/tambah">
-          <button className="flex items-center gap-3 bg-[#2293EE] py-2 px-4 rounded-lg hover:bg-[#4da5ed] active:scale-[0.97] focus:ring focus:ring-blue-200">
+        <div className="col-span-2 md:col-span-1 flex items-center justify-start md:justify-end">
+          <Link href="/manajemen-siswa/tambah" className="w-fit h-fit flex items-center gap-3 bg-[#2293EE] py-2 px-4 rounded-lg hover:bg-[#4da5ed] active:scale-[0.97] focus:ring focus:ring-blue-200">
             <i className="pi pi-plus text-white text-xs font-semibold"></i>
             <span className="text-sm font-medium text-white">Tambah Siswa</span>
-          </button>
-        </Link>
+          </Link>
+        </div>
       </div>
-      <div className="px-4 pb-4 pt-24">
+      <div className="px-4 pb-4 pt-40 md:pt-24">
         <div className="bg-white w-full mt-1 rounded-lg border shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.001)] flex flex-col">
           <div className="py-2 px-4 flex items-center gap-2">
             <i className="pi pi-filter-fill text-[1rem] text-yellow-300"></i>
@@ -185,6 +185,8 @@ export default function ManajemenSiswa() {
         <div className="bg-white w-full mt-4 p-5 rounded-lg border shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.001)]">
           <DataTable
             showGridlines
+            responsiveLayout="stack"
+            breakpoint="960px"
             stripedRows
             paginator
             lazy

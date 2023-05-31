@@ -136,8 +136,8 @@ export default function User({ data }) {
 
   return (
     <>
-      <div className="p-4 flex fixed w-full justify-between items-center bg-white border-b shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.02)] z-50">
-        <div className="flex gap-3">
+      <div className="p-4 pl-20 md:pl-4 fixed w-full grid grid-cols-2 gap-4 bg-white border-b shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.02)] z-50">
+        <div className="col-span-2 md:col-span-1 flex gap-3">
           <div className="w-1 h-12 bg-sky-500 rounded-full"></div>
           <div className="flex flex-col">
             <span className="font-semibold">{data.nama}</span>
@@ -145,7 +145,7 @@ export default function User({ data }) {
           </div>
         </div>
         {isEdit ? (
-          <div className="flex gap-2">
+          <div className="col-span-2 md:col-span-1 flex gap-2 items-center justify-start md:justify-end">
             <button onClick={() => router.back()} className="flex items-center gap-3 border border-gray-400 bg-white py-2 px-4 rounded-lg hover:shadow-lg hover:border-gray-200 active:scale-[0.97]">
               <i className="pi pi-chevron-left text-slate-900 text-xs font-medium"></i>
               <span className="text-sm font-medium text-slate-900">Batal</span>
@@ -160,7 +160,7 @@ export default function User({ data }) {
             </button>
           </div>
         ) : (
-          <div className="flex gap-2">
+          <div className="col-span-2 md:col-span-1 flex gap-2 items-center justify-start md:justify-end">
             <button
               onClick={() => router.push("/manajemen-siswa")}
               className="flex items-center gap-3 border border-gray-400 bg-white py-2 px-4 rounded-lg hover:shadow-lg hover:border-gray-200 active:scale-[0.97]"
@@ -175,9 +175,9 @@ export default function User({ data }) {
           </div>
         )}
       </div>
-      <div className="p-5 pt-24">
-        <form className="w-full p-4 bg-white border shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.02)] rounded-lg grid grid-cols-12">
-          <div className="border-r col-span-7 pr-4">
+      <div className="p-5 pt-40 md:pt-24">
+        <form className="w-full p-4 bg-white border shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.02)] rounded-lg grid grid-cols-12 gap-4">
+          <div className="md:border-r col-span-12 md:col-span-7 md:pr-4">
             <div className="flex gap-2">
               <span className="w-1 h-6 bg-[#2293EE] rounded"></span>
               <h2 className="font-semibold mb-3">Informasi Pribadi</h2>
@@ -321,9 +321,9 @@ export default function User({ data }) {
                   {getFormErrorMessage("jumlah_anggota_keluarga")}
                 </div>
               </div>
-              <div className="grid grid-cols-2 border-t pt-2 mt-2">
-                <div className="col-span-1 flex flex-col gap-3 border-r pr-4">
-                  <div className="col-span-1 flex flex-col gap-1">
+              <div className="grid grid-cols-2 gap-3 border-t pt-2 mt-2">
+                <div className="col-span-2 sm:col-span-1 flex flex-col gap-3 sm:border-r sm:pr-4">
+                  <div className="flex flex-col gap-1">
                     <label htmlFor="nama_ayah" className="text-sm">
                       Nama Ayah
                     </label>
@@ -369,7 +369,7 @@ export default function User({ data }) {
                       </label>
                     </div>
                   </div>
-                  <div className="col-span-1 flex flex-col gap-1">
+                  <div className="flex flex-col gap-1">
                     <label htmlFor="jenis_pekerjaan_ayah" className="text-sm">
                       Jenis Pekerjaan Ayah
                     </label>
@@ -392,7 +392,7 @@ export default function User({ data }) {
                     />
                     {getFormErrorMessage("jenis_pekerjaan_ayah")}
                   </div>
-                  <div className="col-span-1 flex flex-col gap-1">
+                  <div className="flex flex-col gap-1">
                     <label htmlFor="pendapatan_perbulan_ayah" className="text-sm">
                       Pendapatan Perbulan Ayah
                     </label>
@@ -412,8 +412,8 @@ export default function User({ data }) {
                     {getFormErrorMessage("pendapatan_perbulan_ayah")}
                   </div>
                 </div>
-                <div className="col-span-1 flex flex-col gap-3 pl-4">
-                  <div className="col-span-1 flex flex-col gap-1">
+                <div className="col-span-2 sm:col-span-1 flex flex-col gap-3 sm:pl-4">
+                  <div className="flex flex-col gap-1">
                     <label htmlFor="nama_ibu" className="text-sm">
                       Nama Ibu
                     </label>
@@ -459,7 +459,7 @@ export default function User({ data }) {
                       </label>
                     </div>
                   </div>
-                  <div className="col-span-1 flex flex-col gap-1">
+                  <div className="flex flex-col gap-1">
                     <label htmlFor="jenis_pekerjaan_ibu" className="text-sm">
                       Jenis Pekerjaan Ibu
                     </label>
@@ -482,7 +482,7 @@ export default function User({ data }) {
                     />
                     {getFormErrorMessage("jenis_pekerjaan_ibu")}
                   </div>
-                  <div className="col-span-1 flex flex-col gap-1">
+                  <div className="flex flex-col gap-1">
                     <label htmlFor="pendapatan_perbulan_ibu" className="text-sm">
                       Pendapatan Perbulan Ibu
                     </label>
@@ -505,7 +505,7 @@ export default function User({ data }) {
               </div>
             </div>
           </div>
-          <div className="col-span-5 pl-4 flex flex-col justify-between">
+          <div className="col-span-12 md:col-span-5 md:pl-4 flex flex-col justify-between border-t md:border-t-0 pt-4 md:pt-0">
             <div>
               <div className="flex gap-2">
                 <span className="w-1 h-6 bg-[#2293EE] rounded"></span>
@@ -603,7 +603,7 @@ export default function User({ data }) {
                 <span className="mt-5 font-light text-xs">Last Updated on : {data.updated_date ? new Date(data.updated_date).toLocaleString() : new Date(data.created_date).toLocaleString()}</span>
               </div>
             </div>
-            <div className="flex justify-end">
+            <div className="flex sm:justify-end mt-4 sm:mt-0">
               <button
                 role="button"
                 type="button"

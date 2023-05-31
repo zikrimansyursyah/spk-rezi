@@ -216,36 +216,38 @@ export default function Prestasi() {
 
   return (
     <>
-      <div className="p-4 flex fixed w-full justify-between items-center bg-white border-b shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.02)] z-50">
-        <div className="flex gap-3">
+      <div className="p-4 pl-20 md:pl-4 fixed w-full grid grid-cols-2 gap-4 bg-white border-b shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.02)] z-50">
+        <div className="col-span-2 md:col-span-1 flex gap-3">
           <div className="w-1 h-12 bg-sky-500 rounded-full"></div>
           <div className="flex flex-col">
             <span className="font-semibold">Prestasi</span>
             <span className="text-sm text-gray-600">Data Prestasi Siswa</span>
           </div>
         </div>
-        <button
-          onClick={() => {
-            setTipeDialog("tambah");
-            setVisibleDialogAdd(true);
-            getListSiswa();
-          }}
-          type="submit"
-          className="flex items-center gap-3 bg-[#2293EE] py-2 px-4 rounded-lg hover:bg-[#4da5ed] active:scale-[0.97] focus:ring focus:ring-blue-200"
-        >
-          <i className="pi pi-plus text-white text-xs font-medium"></i>
-          <span className="text-sm font-medium text-white">Tambah Data Prestasi</span>
-        </button>
+        <div className="col-span-2 md:col-span-1 flex items-center md:justify-end">
+          <button
+            onClick={() => {
+              setTipeDialog("tambah");
+              setVisibleDialogAdd(true);
+              getListSiswa();
+            }}
+            type="submit"
+            className="flex items-center gap-3 bg-[#2293EE] py-2 px-4 rounded-lg hover:bg-[#4da5ed] active:scale-[0.97] focus:ring focus:ring-blue-200"
+          >
+            <i className="pi pi-plus text-white text-xs font-medium"></i>
+            <span className="text-sm font-medium text-white">Tambah Data Prestasi</span>
+          </button>
+        </div>
       </div>
-      <div className="px-4 pb-4 pt-24">
+      <div className="px-4 pb-4 pt-40 md:pt-24">
         <div className="bg-white w-full mt-1 rounded-lg border shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.001)] flex flex-col">
           <div className="py-2 px-4 flex items-center gap-2">
             <i className="pi pi-filter-fill text-[1rem] text-yellow-300"></i>
             <span className="font-medium">Filter</span>
           </div>
           <span className="border-b"></span>
-          <div className="py-4 px-4 flex gap-4 items-center">
-            <div className="flex flex-col gap-1">
+          <div className="py-4 px-4 grid grid-cols-12 gap-4">
+            <div className="col-span-5 sm:col-span-2 flex flex-col gap-1">
               <label htmlFor="tingkat_kelas" className="text-sm">
                 Tingkat Kelas
               </label>
@@ -269,7 +271,7 @@ export default function Prestasi() {
                 className={classNames({ "p-inputtext-sm": true })}
               />
             </div>
-            <div className="flex flex-col gap-1">
+            <div className="col-span-7 sm:col-span-4 md:col-span-2 flex flex-col gap-1">
               <label htmlFor="semester_filter" className="text-sm">
                 Semester
               </label>
@@ -284,10 +286,10 @@ export default function Prestasi() {
                   { label: "Genap", value: "genap" },
                 ]}
                 placeholder="semester"
-                className="p-inputtext-sm w-48"
+                className="p-inputtext-sm"
               />
             </div>
-            <div className="flex flex-col gap-1">
+            <div className="col-span-12 sm:col-span-4 md:col-span-3 flex flex-col gap-1">
               <label htmlFor="tahun_ajaran_filter" className="text-sm">
                 Tahun Ajaran
               </label>
@@ -298,7 +300,7 @@ export default function Prestasi() {
                 onChange={(e) => setTahunAjaran(e.target.value)}
                 options={optionTahunAjaran}
                 placeholder="tahun ajaran"
-                className="p-inputtext-sm w-26"
+                className="p-inputtext-sm"
               />
             </div>
           </div>
@@ -308,6 +310,8 @@ export default function Prestasi() {
             showGridlines
             stripedRows
             paginator
+            responsiveLayout="stack"
+            breakpoint="960px"
             lazy
             rowsPerPageOptions={[10, 25, 50]}
             rows={lazyParams.rows}
@@ -334,7 +338,7 @@ export default function Prestasi() {
         header={tipeDialog === "tambah" ? "Tambah Data Prestasi" : `Ubah Data Prestasi`}
         dismissableMask
         visible={visibleDialogAdd}
-        style={{ width: "40vw" }}
+        breakpoints={{  '1440px': '45vw', '1024px': '75vw', '641px': '95vw' }}
         onHide={() => {
           setVisibleDialogAdd(false);
           formik.resetForm();
@@ -343,7 +347,7 @@ export default function Prestasi() {
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-5 gap-4">
             {tipeDialog === "tambah" && (
-              <div className="col-span-2 flex flex-col gap-1">
+              <div className="col-span-5 sm:col-span-2 flex flex-col gap-1">
                 <label htmlFor="tingkat_kelas" className="text-sm">
                   Tingkat Kelas
                 </label>
@@ -369,7 +373,7 @@ export default function Prestasi() {
                 />
               </div>
             )}
-            <div className={classNames({ "flex flex-col gap-1": true, "col-span-3": tipeDialog === "tambah", "col-span-5": tipeDialog !== "tambah" })}>
+            <div className={classNames({ "flex flex-col gap-1": true, "col-span-5 sm:col-span-3": tipeDialog === "tambah", "col-span-5": tipeDialog !== "tambah" })}>
               <label htmlFor="id_siswa" className="text-sm">
                 Siswa
               </label>
