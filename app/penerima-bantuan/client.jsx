@@ -400,7 +400,7 @@ export default function PenerimaBantuan() {
 
       return (
         <>
-          <div className="italic mb-3">"Menentukan Hasil Normalisasi dengan perhitungan berdasarkan rumus yang ditentukan (Cost/Benefit)""</div>
+          <div className="italic mb-3">"Menentukan Hasil Normalisasi dengan perhitungan berdasarkan rumus yang ditentukan (Cost/Benefit)"</div>
           <DataTable
             value={rawResult}
             size="small"
@@ -431,7 +431,7 @@ export default function PenerimaBantuan() {
       };
       return (
         <>
-          <div className="italic mb-3">"Menentukan Hasil Normalisasi dengan perhitungan berdasarkan rumus yang ditentukan (Cost/Benefit)""</div>
+          <div className="italic mb-3">"Menentukan Hasil Normalisasi dengan perhitungan berdasarkan rumus yang ditentukan (Cost/Benefit)"</div>
           <DataTable
             value={rawAkhir}
             size="small"

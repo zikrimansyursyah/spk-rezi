@@ -98,8 +98,33 @@ async function viewDataPenerima(req, res) {
       attributes[v.kode] = v;
     }
 
+    // FUNGSI MENCARI NILAI MAKSIMUM DAN MINIMUM DI KRITERIA
+    function findMinMaxValue(type = 'MIN', array, property) {
+      let value = type.toUpperCase() === 'MAX' ? -Infinity : Infinity;
+      
+      for (let i = 0; i < array.length; i++) {
+        if (type.toUpperCase() === 'MAX') {
+          if (array[i][property] > value) {
+            value = array[i][property];
+          }
+        } else if (type.toUpperCase() === 'MIN') {
+          if (array[i][property] < value) {
+            value = array[i][property];
+          }
+        }
+      }
+      
+      return value;
+    }
+
     // MELAKUKAN NORMALISASI MATRIKS
     let result = {};
+
+    for (const key of Object.keys(attributes)) {
+      attributes[key]['nilai_max'] = findMinMaxValue('MAX', data, key);
+      attributes[key]['nilai_min'] = findMinMaxValue('MIN', data, key);
+    }
+
     for (const row of data) {
       let normalisasi = [];
       Object.keys(row).map((val) => {
