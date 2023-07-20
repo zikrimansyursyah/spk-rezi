@@ -1,7 +1,8 @@
 "use client";
 
 import { AppContext } from "@/context";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
+import JsPDF from "jspdf";
 
 // Components
 import { Dropdown } from "primereact/dropdown";
@@ -29,6 +30,8 @@ export default function PenerimaBantuan() {
   const [rawAttributes, setRawAttributes] = useState([]);
   const [rawResult, setRawResult] = useState([]);
   const [rawAkhir, setRawAkhir] = useState([]);
+  const [visiblePdf, setVisiblePdf] = useState(false);
+  const [triggerVisiblePdf, setTriggerVisiblePdf] = useState(false);
 
   // Detail Penilaian
   const [savedFilter, setSavedFilter] = useState({ semester, tahunAjaran, tingkatKelas, limit });
@@ -242,11 +245,27 @@ export default function PenerimaBantuan() {
       });
   };
 
+  const generatePDF = () => {
+    if (dataPenerima.length < 1) return;
+    setVisiblePdf(true);
+    const report = new JsPDF("portrait", "pt", "a4");
+    report.html(document.querySelector("#data-penerima")).then(() => {
+      report.save(
+        `Ranking Data ${new Date().toLocaleString("id", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        })}.pdf`
+      );
+      setTriggerVisiblePdf((prev) => (prev ? false : true));
+    });
+  };
+
   // LAYOUT
   const customizeMarker = (item) => {
     return (
-      <div className="flex items-center gap-2 px-5 py-3 rounded-xl bg-slate-800">
-        <span className="text-white text-sm">{item.point_name}</span>
+      <div className="flex items-center gap-2 rounded-xl bg-slate-800 px-5 py-3">
+        <span className="text-sm text-white">{item.point_name}</span>
         {item.point_icon && <i className={`${item.point_icon} text-white`}></i>}
       </div>
     );
@@ -254,15 +273,15 @@ export default function PenerimaBantuan() {
 
   const customizeContent = (item) => {
     return (
-      <div className="py-3 px-5 mb-10 rounded-lg bg-blue-100 w-full min-h-[4rem] shadow-lg shadow-gray-200">
+      <div className="mb-10 min-h-[4rem] w-full rounded-lg bg-blue-100 py-3 px-5 shadow-lg shadow-gray-200">
         <span className="font-semibold">{item.title}</span>
-        <div className="flex flex-col gap-3 mt-3">
+        <div className="mt-3 flex flex-col gap-3">
           {(item.data || []).map((data, index) => {
             return (
               <div
                 key={index}
-                className={classNames("bg-white p-3 rounded-lg flex flex-col gap-2", {
-                  "cursor-pointer motion-safe:hover:scale-[1.02] hover:shadow-lg hover:shadow-blue-200": data.link_text && data.on_click,
+                className={classNames("flex flex-col gap-2 rounded-lg bg-white p-3", {
+                  "cursor-pointer hover:shadow-lg hover:shadow-blue-200 motion-safe:hover:scale-[1.02]": data.link_text && data.on_click,
                 })}
                 onClick={() => {
                   if (!data.link_text && !data.on_click) return;
@@ -301,7 +320,7 @@ export default function PenerimaBantuan() {
     } else if (tipeDetail === "table_bobot") {
       return (
         <div>
-          <div className="font-medium mb-2">Master Data</div>
+          <div className="mb-2 font-medium">Master Data</div>
           <DataTable value={rawAttributes} size="small" showGridlines responsiveLayout="stack" breakpoint="940px">
             <Column field="kode" header="Kode" style={{ textAlign: "center" }} headerClassName="th-h-center" body={(e) => <span>{e.kode && e.kode.toUpperCase()}</span>} />
             <Column field="nama_kriteria" header="Nama Kriteria" headerClassName="th-h-center" />
@@ -309,7 +328,7 @@ export default function PenerimaBantuan() {
             <Column field="nilai_min" header="Nilai Min" style={{ textAlign: "center" }} headerClassName="th-h-center" />
             <Column field="nilai_max" header="Nilai Max" style={{ textAlign: "center" }} headerClassName="th-h-center" />
           </DataTable>
-          <div className="font-medium mt-6 mb-2">Detail Kriteria Bobot</div>
+          <div className="mt-6 mb-2 font-medium">Detail Kriteria Bobot</div>
           <TabView>
             {rawAttributes.map((item, i) => (
               <TabPanel key={i} header={item.kode?.toUpperCase()}>
@@ -344,7 +363,7 @@ export default function PenerimaBantuan() {
       );
       return (
         <>
-          <div className="italic mb-3">"detail data masing masing siswa dikonversi menjadi poin penilaian yang ditentukan berdasarkan ketentuan kriteria dan bobot"</div>
+          <div className="mb-3 italic">"detail data masing masing siswa dikonversi menjadi poin penilaian yang ditentukan berdasarkan ketentuan kriteria dan bobot"</div>
           <DataTable value={rawData} size="small" showGridlines headerColumnGroup={columnGroup} responsiveLayout="stack" breakpoint="940px">
             <Column field="nama" header="Nama Siswa" />
             <Column field="c1" header="C1" style={{ textAlign: "center" }} />
@@ -375,7 +394,7 @@ export default function PenerimaBantuan() {
       );
       return (
         <>
-          <div className="italic mb-3">
+          <div className="mb-3 italic">
             "poin penilaian dirubah menjadi <span className="font-medium not-italic">Xij</span> sebelum dinormalisasi dan dilakukan perhitungan"
           </div>
           <DataTable value={rawData} size="small" showGridlines headerColumnGroup={columnGroup} responsiveLayout="stack" breakpoint="940px">
@@ -400,7 +419,7 @@ export default function PenerimaBantuan() {
 
       return (
         <>
-          <div className="italic mb-3">"Menentukan Hasil Normalisasi dengan perhitungan berdasarkan rumus yang ditentukan (Cost/Benefit)"</div>
+          <div className="mb-3 italic">"Menentukan Hasil Normalisasi dengan perhitungan berdasarkan rumus yang ditentukan (Cost/Benefit)"</div>
           <DataTable
             value={rawResult}
             size="small"
@@ -412,7 +431,8 @@ export default function PenerimaBantuan() {
             sortOrder={1}
             scrollable
             scrollHeight={maximizedDialog ? "650px" : "500px"}
-            responsiveLayout="stack" breakpoint="940px"
+            responsiveLayout="stack"
+            breakpoint="940px"
           >
             <Column field="nama" header="Nama Siswa" />
             <Column field="kode_kriteria" header="Kode Kriteria" style={{ textAlign: "center" }} />
@@ -431,7 +451,7 @@ export default function PenerimaBantuan() {
       };
       return (
         <>
-          <div className="italic mb-3">"Menentukan Hasil Normalisasi dengan perhitungan berdasarkan rumus yang ditentukan (Cost/Benefit)"</div>
+          <div className="mb-3 italic">"Menentukan Hasil Normalisasi dengan perhitungan berdasarkan rumus yang ditentukan (Cost/Benefit)"</div>
           <DataTable
             value={rawAkhir}
             size="small"
@@ -443,7 +463,8 @@ export default function PenerimaBantuan() {
             sortOrder={1}
             // scrollable
             // scrollHeight={maximizedDialog ? "650px" : "500px"}
-            responsiveLayout="stack" breakpoint="940px"
+            responsiveLayout="stack"
+            breakpoint="940px"
           >
             <Column field="nama" header="Nama Siswa" />
             <Column field="kode_bobot" header="Kode Bobot" style={{ textAlign: "center" }} />
@@ -459,18 +480,22 @@ export default function PenerimaBantuan() {
     }
   };
 
+  useEffect(() => {
+    setVisiblePdf(false);
+  }, [triggerVisiblePdf]);
+
   return (
     <>
-      <div className="p-4 pl-20 md:pl-4 fixed w-full grid grid-cols-12 gap-4 bg-white border-b shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.02)] z-50">
-        <div className="col-span-12 md:col-span-5 lg:col-span-4 flex gap-3">
-          <div className="w-1 h-12 bg-sky-500 rounded-full"></div>
+      <div className="fixed z-50 grid w-full grid-cols-12 gap-4 border-b bg-white p-4 pl-20 shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.02)] md:pl-4">
+        <div className="col-span-12 flex gap-3 md:col-span-5 lg:col-span-4">
+          <div className="h-12 w-1 rounded-full bg-sky-500"></div>
           <div className="flex flex-col">
             <span className="font-semibold">Penerima Bantuan</span>
             <span className="text-sm text-gray-600">Data Siswa Penerima Bantuan Kesejahteraan</span>
           </div>
         </div>
-        <div className="col-span-12 md:col-span-7 lg:col-span-8 grid grid-cols-12 gap-4">
-          <div className="col-span-4 sm:col-span-2 md:col-span-3 lg:col-span-2 flex flex-col gap-1">
+        <div className="col-span-12 grid grid-cols-12 gap-4 md:col-span-7 lg:col-span-8">
+          <div className="col-span-4 flex flex-col gap-1 sm:col-span-2 md:col-span-3 lg:col-span-2">
             <label htmlFor="tingkat_kelas" className="text-sm">
               Tingkat Kelas
             </label>
@@ -493,7 +518,7 @@ export default function PenerimaBantuan() {
               className={classNames({ "p-inputtext-sm": true })}
             />
           </div>
-          <div className="col-span-8 sm:col-span-4 md:col-span-4 lg:col-span-3 flex flex-col gap-1">
+          <div className="col-span-8 flex flex-col gap-1 sm:col-span-4 md:col-span-4 lg:col-span-3">
             <label htmlFor="semester_filter" className="text-sm">
               Semester
             </label>
@@ -510,7 +535,7 @@ export default function PenerimaBantuan() {
               className="p-inputtext-sm"
             />
           </div>
-          <div className="col-span-8 sm:col-span-4 md:col-span-5 lg:col-span-3 flex flex-col gap-1">
+          <div className="col-span-8 flex flex-col gap-1 sm:col-span-4 md:col-span-5 lg:col-span-3">
             <label htmlFor="tahun_ajaran_filter" className="text-sm">
               Tahun Ajaran
             </label>
@@ -524,7 +549,7 @@ export default function PenerimaBantuan() {
               className="p-inputtext-sm"
             />
           </div>
-          <div className="col-span-4 sm:col-span-2 md:col-span-2 lg:col-span-2 flex flex-col gap-1">
+          <div className="col-span-4 flex flex-col gap-1 sm:col-span-2 md:col-span-2 lg:col-span-2">
             <label htmlFor="limit" className="text-sm">
               Limit
             </label>
@@ -545,84 +570,132 @@ export default function PenerimaBantuan() {
               className="p-inputtext-sm"
             />
           </div>
-          <div className="col-span-12 md:col-span-2 lg:col-span-2 flex items-end">
+          <div className="col-span-12 flex items-end md:col-span-2 lg:col-span-2">
             <button
               onClick={() => getListPenerima()}
               type="submit"
-              className="lg:w-full h-11 flex items-center justify-center gap-3 bg-[#2293EE] py-2 px-4 rounded-lg hover:bg-[#4da5ed] active:scale-[0.97] focus:ring focus:ring-blue-200"
+              className="flex h-11 items-center justify-center gap-3 rounded-lg bg-[#2293EE] py-2 px-4 hover:bg-[#4da5ed] focus:ring focus:ring-blue-200 active:scale-[0.97] lg:w-full"
             >
-              <i className="pi pi-search text-white text-xs font-medium"></i>
+              <i className="pi pi-search text-xs font-medium text-white"></i>
               <span className="text-sm font-medium text-white">Tentukan</span>
             </button>
           </div>
         </div>
       </div>
       <div className="px-4 pb-4 pt-[22rem] sm:pt-[16rem] md:pt-[12rem] lg:pt-28">
-        <div className="bg-white w-full rounded-lg border shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.001)] grid grid-cols-12 gap-4 p-4">
-          <div className="col-span-12 md:col-span-9 flex flex-col gap-1">
+        <div className="grid w-full grid-cols-12 gap-4 rounded-lg border bg-white p-4 shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.001)]">
+          <div className="col-span-12 flex flex-col gap-1 md:col-span-9">
             <span className="text-lg font-medium">
               Daftar Penerima Bantuan Periode {tahunAjaran} Semester {semester.slice(0, 1).toUpperCase() + semester.slice(1)}
             </span>
             <span className="text-sm text-gray-500">daftar penerima bantuan yang terlampir dibawah ini telah dikalkulasikan secara valid dengan perhitungan Simple Additive Weighting</span>
           </div>
           {dataPenerima.length > 0 && (
-            <div className="col-span-12 md:col-span-3 flex items-center justify-end">
+            <div className="col-span-12 flex items-center justify-end gap-2 md:col-span-3">
               <button
                 onClick={() => getListPenerima(true)}
                 type="submit"
-                className="flex items-center h-fit gap-3 bg-[#2293EE] py-2 px-4 rounded-lg hover:bg-[#4da5ed] active:scale-[0.97] focus:ring focus:ring-blue-200"
+                className="flex h-fit items-center gap-3 rounded-lg bg-[#2293EE] py-2 px-4 hover:bg-[#4da5ed] focus:ring focus:ring-blue-200 active:scale-[0.97]"
               >
                 <span className="text-xs font-medium text-white">Lihat Detail Perhitungan</span>
+              </button>
+              <button
+                onClick={generatePDF}
+                type="submit"
+                className="flex h-fit items-center gap-3 rounded-lg bg-[#2293EE] py-2 px-4 hover:bg-[#4da5ed] focus:ring focus:ring-blue-200 active:scale-[0.97]"
+              >
+                <span className="text-xs font-medium text-white">Export to PDF</span>
               </button>
             </div>
           )}
         </div>
         {dataPenerima.length === 0 && (
-          <div className="flex justify-center items-center mt-10">
-            <div className="p-4 bg-[#2293EE] animate-pulse rounded-lg flex flex-col gap-1 items-center">
-              <span className="text-white font-medium">Tidak Ada Data</span>
+          <div className="mt-10 flex items-center justify-center">
+            <div className="flex animate-pulse flex-col items-center gap-1 rounded-lg bg-[#2293EE] p-4">
+              <span className="font-medium text-white">Tidak Ada Data</span>
               <span className="text-sm text-white">coba cari data dengan filter yang berbeda</span>
             </div>
           </div>
         )}
       </div>
-      <div className="px-4 pb-10 flex flex-col gap-4">
+      <div className="flex flex-col gap-4 px-4 pb-10">
+        {console.log({ dataPenerima })}
         {(dataPenerima || []).map((item, index) => (
           <div
             key={index}
-            className="p-6 bg-white w-full rounded-lg border shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.001)] grid grid-cols-12 gap-4 hover:shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.1)] hover:border-blue-400"
+            className="grid w-full grid-cols-12 gap-4 rounded-lg border bg-white p-6 shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.001)] hover:border-blue-400 hover:shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.1)]"
           >
-            <div className="col-span-2 md:col-span-1 flex items-center">
-              <span className="font-medium text-lg pr-8 border-r-2 border-blue-400">{item.no}</span>
+            <div className="col-span-2 flex items-center md:col-span-1">
+              <span className="border-r-2 border-blue-400 pr-8 text-lg font-medium">{item.no}</span>
             </div>
-            <div className="col-span-10 md:col-span-3 flex flex-col gap-1">
+            <div className="col-span-10 flex flex-col gap-1 md:col-span-3">
               <span className="text-xs text-gray-500">Nama Lengkap</span>
               <span className="font-medium">{item.nama}</span>
             </div>
-            <div className="col-span-12 md:col-span-2 flex flex-col gap-1">
+            <div className="col-span-12 flex flex-col gap-1 md:col-span-2">
               <span className="text-xs text-gray-500">Nomor Induk Sekolah</span>
               <span className="font-medium">{item.no_induk_sekolah}</span>
             </div>
-            <div className="col-span-6 sm:col-span-4 md:col-span-2 flex flex-col gap-1">
+            <div className="col-span-6 flex flex-col gap-1 sm:col-span-4 md:col-span-2">
               <span className="text-xs text-gray-500">Nama Ayah</span>
               <span className="font-medium">{item.nama_ayah}</span>
             </div>
-            <div className="col-span-6 sm:col-span-4 md:col-span-2 flex flex-col gap-1">
+            <div className="col-span-6 flex flex-col gap-1 sm:col-span-4 md:col-span-2">
               <span className="text-xs text-gray-500">Nama Ibu</span>
               <span className="font-medium">{item.nama_ibu}</span>
             </div>
-            <div className="col-span-6 sm:col-span-4 md:col-span-1 flex flex-col gap-1">
+            <div className="col-span-6 flex flex-col gap-1 sm:col-span-4 md:col-span-1">
               <span className="text-xs text-gray-500">Nilai</span>
               <span className="font-medium">{item.nilai}</span>
             </div>
-            <div className="col-span-6 sm:col-span-12 md:col-span-1 flex items-center justify-end sm:justify-start md:justify-end">
+            <div className="col-span-6 flex items-center justify-end sm:col-span-12 sm:justify-start md:col-span-1 md:justify-end">
               <button
                 onClick={() => getListPenerima(true, item.id)}
                 type="submit"
-                className="flex items-center gap-3 bg-[#2293EE] py-2 px-4 rounded-lg hover:bg-[#4da5ed] active:scale-[0.97] focus:ring focus:ring-blue-200"
+                className="flex items-center gap-3 rounded-lg bg-[#2293EE] py-2 px-4 hover:bg-[#4da5ed] focus:ring focus:ring-blue-200 active:scale-[0.97]"
               >
                 <span className="text-[0.6rem] font-medium text-white">Lihat Detail</span>
               </button>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div id="data-penerima" className={classNames("z-50 flex w-[158mm] flex-col gap-4 bg-white p-8 text-[10px]", { hidden: !visiblePdf })}>
+        <div className="grid w-full grid-cols-12 gap-4 rounded-lg border bg-white p-4 shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.001)]">
+          <div className="col-span-12 flex flex-col gap-1">
+            <span className="text-lg font-medium">
+              Daftar Penerima Bantuan Periode {tahunAjaran} Semester {semester.slice(0, 1).toUpperCase() + semester.slice(1)}
+            </span>
+            <span className="text-sm text-gray-500">daftar penerima bantuan yang terlampir dibawah ini telah dikalkulasikan secara valid dengan perhitungan Simple Additive Weighting</span>
+          </div>
+        </div>
+        {(dataPenerima || []).map((item, index) => (
+          <div
+            key={index}
+            className="grid w-full grid-cols-12 gap-4 rounded-lg border bg-white p-6 shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.001)] hover:border-blue-400 hover:shadow-[0px_8px_15px_-3px_rgba(0,0,0,0.1)]"
+          >
+            <div className="col-span-2 flex items-start md:col-span-1">
+              <span className="pr-8 text-lg font-medium">{item.no}</span>
+            </div>
+            <div className="col-span-10 flex flex-col gap-1 md:col-span-3">
+              <span className="text-xs text-gray-500">Nama Lengkap</span>
+              <span className="font-medium">{item.nama}</span>
+            </div>
+            <div className="col-span-12 flex flex-col gap-1 md:col-span-3">
+              <span className="text-xs text-gray-500">Nomor Induk Sekolah</span>
+              <span className="font-medium">{item.no_induk_sekolah}</span>
+            </div>
+            <div className="col-span-6 flex flex-col gap-1 sm:col-span-4 md:col-span-2">
+              <span className="text-xs text-gray-500">Nama Ayah</span>
+              <span className="font-medium">{item.nama_ayah}</span>
+            </div>
+            <div className="col-span-6 flex flex-col gap-1 sm:col-span-4 md:col-span-2">
+              <span className="text-xs text-gray-500">Nama Ibu</span>
+              <span className="font-medium">{item.nama_ibu}</span>
+            </div>
+            <div className="col-span-6 flex flex-col gap-1 sm:col-span-4 md:col-span-1">
+              <span className="text-xs text-gray-500">Nilai</span>
+              <span className="font-medium">{item.nilai}</span>
             </div>
           </div>
         ))}
@@ -636,32 +709,32 @@ export default function PenerimaBantuan() {
           setMaximizedDialog(false);
           setDialogDetailPerhitunganVisibility(false);
         }}
-        className="w-11/12 h-5/6 rounded-2xl"
+        className="h-5/6 w-11/12 rounded-2xl"
         headerClassName="dialog-header-penilaian"
         contentClassName="dialog-content-penilaian"
-        breakpoints={{ "1024": "75vw", "960px": "95vw", "641px": "100vw" }}
+        breakpoints={{ 1024: "75vw", "960px": "95vw", "641px": "100vw" }}
         maximizable
         maximized={maximizedDialog}
         onMaximize={(e) => {
           setMaximizedDialog(e.maximized);
         }}
       >
-        <div className="pt-4 relative">
+        <div className="relative pt-4">
           <div className="p-5">
             <Timeline value={flowPerhitungan} align="alternate" className="flow" marker={customizeMarker} content={customizeContent} />
           </div>
           {visibleSidebarDetail && (
-            <div className="absolute top-0 left-0 right-0 w-full h-full grid grid-cols-12">
+            <div className="absolute top-0 left-0 right-0 grid h-full w-full grid-cols-12">
               <div
-                className="bg-slate-800/10 hidden md:block md:col-span-7"
+                className="hidden bg-slate-800/10 md:col-span-7 md:block"
                 onClick={() => {
                   setTipeDetail("");
                   setVisibleSidebarDetail(false);
                 }}
               ></div>
-              <div className="bg-white col-span-12 md:col-span-5 relative">
-                <div className={classNames("p-4 fixed", { "w-screen md:w-[37vw]": !maximizedDialog, "w-screen md:w-[41vw]": maximizedDialog })}>
-                  <div className="flex gap-4 items-center">
+              <div className="relative col-span-12 bg-white md:col-span-5">
+                <div className={classNames("fixed p-4", { "w-screen md:w-[37vw]": !maximizedDialog, "w-screen md:w-[41vw]": maximizedDialog })}>
+                  <div className="flex items-center gap-4">
                     <Button
                       icon="pi pi-times"
                       rounded
