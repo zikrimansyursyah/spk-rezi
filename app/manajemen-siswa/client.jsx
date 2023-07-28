@@ -121,7 +121,7 @@ export default function ManajemenSiswa() {
   };
 
   const handleDownloadTemplate = () => {
-    FileSaver.saveAs("/template.xlsx", "Template Import Data Siswa.xlsx");
+    FileSaver.saveAs("/Template Import Data.xlsx", "Template Import Data Siswa.xlsx");
   };
 
   const handleUploadFile = (e) => {
