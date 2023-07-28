@@ -364,7 +364,14 @@ export default function ManajemenSiswa() {
         }}
       >
         <div className="mb-4 flex">
-          <InputText placeholder="Pilih file data" type="file" value={fileName} onChange={handleUploadFile} className="p-inputtext-sm rounded-tr-none rounded-br-none" />
+          <InputText
+            placeholder="Pilih file data"
+            type="file"
+            value={fileName}
+            onChange={handleUploadFile}
+            className="p-inputtext-sm"
+            style={{ borderTopRightRadius: "0", borderBottomRightRadius: "0" }}
+          />
           <button
             onClick={handleProcessData}
             disabled={!file}
