@@ -120,6 +120,15 @@ export default function ManajemenSiswa() {
       });
   };
 
+  const changeDateFormat = (inputDate) => {
+    try {
+      const [day, month, year] = inputDate.split("-");
+      const formattedDate = `${year}-${month}-${day}`;
+      return formattedDate;
+    } catch (error) {
+      return null;
+    }
+  };
   const handleDownloadTemplate = () => {
     FileSaver.saveAs("/Template Import Data.xlsx", "Template Import Data Siswa.xlsx");
   };
@@ -158,12 +167,18 @@ export default function ManajemenSiswa() {
     });
 
     let dataList = [];
-    loading({ text: `Kami sedang menambah 0/${data.length} data`, visible: true });
     for (const dt of data) {
       let temp = {};
       for (let i = 0; i < column.length; i++) {
         if (column[i] === "Username") {
           temp[column[i]] = dt[i].toLowerCase();
+        } else if (column[i] === "Tanggal Lahir") {
+          let regexDate = /^(0[1-9]|[1-2]\d|3[0-1])-(0[1-9]|1[0-2])-\d{4}$/;
+          if (!regexDate.test(dt[i])) {
+            return toast.current.show({ severity: "warn", summary: "Data Tidak Sesuai", sticky: true, detail: `Data Tanggal Lahir tidak sesuai panduan, pada data ${dt[0]} (${dt[2]})` });
+          } else {
+            temp[column[i]] = changeDateFormat(dt[i]);
+          }
         } else {
           temp[column[i]] = dt[i];
         }
@@ -176,7 +191,7 @@ export default function ManajemenSiswa() {
       const res = validateSchema(userImportSchema, e);
 
       if (res._error) {
-        return toast.current.show({ severity: "warn", summary: "Data Tidak Sesuai", detail: `${res.message} pada data ${e["Nama Siswa"]} (${e["NISN"]})` });
+        return toast.current.show({ severity: "warn", summary: "Data Tidak Sesuai", sticky: true, detail: `${res.message} pada data ${e["Nama Siswa"]} (${e["NISN"]})` });
       }
 
       let temp = {};
@@ -185,6 +200,8 @@ export default function ManajemenSiswa() {
       }
       payload.push(temp);
     }
+
+    loading({ text: `Kami sedang menambah 0/${data.length} data`, visible: true });
 
     let successInsert = 0;
     let failedInsert = 0;
