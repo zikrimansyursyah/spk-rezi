@@ -31,61 +31,73 @@ export const userSchema = yup.object().shape({
 });
 
 export const userImportSchema = yup.object().shape({
-  NISN: yup.string().required("nisn harus diisi"),
-  "Nomor Induk Sekolah": yup.string().required("nomor induk sekolah harus diisi"),
-  "Tingkat Kelas": yup.string().required("tingkat kelas harus dipilih 1 - 6"),
-  Username: yup.string().min(4, "username minimal 4 digit/karakter").required("username harus diisi"),
-  Password: yup.string().min(6, "password minimal 6 karakter").required("password harus diisi"),
-  "Nama Siswa": yup.string().min(3, "nama siswa minimal 3 karakter").required("nama siswa harus diisi"),
-  "Tempat Lahir": yup.string().min(3, "tempat lahir minimal 3 karakter").required("tempat lahir harus diisi"),
-  "Tanggal Lahir": yup.string().required("tangal lahir harus diisi"),
-  "Jenis Kelamin": yup
+  nisn: yup
+    .string()
+    .matches(/^[0-9]+$/, "nisn hanya berupa angka")
+    .required("nisn harus diisi"),
+  no_induk_sekolah: yup
+    .string()
+    .matches(/^[0-9]+$/, "nomor induk sekolah hanya berupa angka")
+    .required("nomor induk sekolah harus diisi"),
+  tingkat_kelas: yup
+    .string()
+    .matches(/^(1|2|3|4|5|6|Lulus|lulus)$/i, "tingkat kelas harus diisi 1 - 6 atau 'Lulus'")
+    .required("tingkat kelas harus diisi"),
+  username: yup.string().matches(/^\S*$/, "username tidak boleh mengandung spasi").min(4, "username minimal 4 digit/karakter").required("username harus diisi"),
+  password: yup.string().min(6, "password minimal 6 karakter").required("password harus diisi"),
+  nama: yup.string().min(3, "nama siswa minimal 3 karakter").required("nama siswa harus diisi"),
+  tempat_lahir: yup.string().min(3, "tempat lahir minimal 3 karakter").required("tempat lahir harus diisi"),
+  tanggal_lahir: yup
+    .string()
+    .matches(/^(0[1-9]|[1-2]\d|3[0-1])-(0[1-9]|1[0-2])-\d{4}$/, "tanggal lahir harus sesuai format angka")
+    .required("tangal lahir harus diisi"),
+  jenis_kelamin: yup
     .string()
     .matches(/^(Laki - Laki|Perempuan)$/i, 'Jenis Kelamin hanya "Laki - Laki" / "Perempuan"')
     .required("jenis kelamin harus diisi"),
-  Alamat: yup.string().min(5, "alamat minimal 5 karakter").required("alamat harus diisi"),
-  "Nomor Telepon": yup.string().min(7, "nomor telepon minimal 7 karakter").required("nomor telepon harus diisi"),
-  "Status Tempat Tinggal": yup
+  alamat: yup.string().min(5, "alamat minimal 5 karakter").required("alamat harus diisi"),
+  no_telp: yup.string().min(7, "nomor telepon minimal 7 karakter").required("nomor telepon harus diisi"),
+  status_tempat_tinggal: yup
     .string()
     .matches(/^(Rumah Kontrak|Rumah Pribadi)$/i, 'Status Tempat Tinggal hanya "Rumah Kontrak" / "Rumah Pribadi"')
     .required("status tempat tinggal harus diisi"),
-  "Jumlah Saudara Kandung": yup.number().required("jumlah saudara kandung harus diisi"),
-  "Status Pekerjaan Ayah": yup
+  jumlah_anggota_keluarga: yup.number().required("jumlah saudara kandung harus diisi"),
+  is_ayah_bekerja: yup
     .string()
     .matches(/^(Bekerja|Tidak Bekerja)$/i, 'Status Pekerjaan hanya "Bekerja" / "Tidak Bekerja"')
     .required("status pekerjaan harus diisi"),
-  "Nama Ayah": yup.string().min(3, "nama ayah minimal 3 karakter").required("nama ayah harus diisi"),
-  "Jenis Pekerjaan Ayah": yup.string().optional(),
-  "Pendapatan Ayah Perbulan": yup.number().optional(),
-  "Status Pekerjaan Ibu": yup
+  nama_ayah: yup.string().min(3, "nama ayah minimal 3 karakter").required("nama ayah harus diisi"),
+  jenis_pekerjaan_ayah: yup.string().optional(),
+  pendapatan_perbulan_ayah: yup.number().optional(),
+  is_ibu_bekerja: yup
     .string()
     .matches(/^(Bekerja|Tidak Bekerja)$/i, 'Status Pekerjaan hanya "Bekerja" / "Tidak Bekerja"')
     .required("status pekerjaan harus diisi"),
-  "Nama Ibu": yup.string().min(3, "nama ibu minimal 3 karakter").required("nama ibu harus diisi"),
-  "Jenis Pekerjaan Ibu": yup.string().optional(),
-  "Pendapatan Ibu Perbulan": yup.number().optional(),
+  nama_ibu: yup.string().min(3, "nama ibu minimal 3 karakter").required("nama ibu harus diisi"),
+  jenis_pekerjaan_ibu: yup.string().optional(),
+  pendapatan_perbulan_ibu: yup.number().optional(),
 });
 
 export const mapperRequest = {
-  NISN: "nisn",
-  "Nomor Induk Sekolah": "no_induk_sekolah",
-  "Tingkat Kelas": "tingkat_kelas",
-  Username: "username",
-  Password: "password",
-  "Nama Siswa": "nama",
-  "Tempat Lahir": "tempat_lahir",
-  "Tanggal Lahir": "tanggal_lahir",
-  "Jenis Kelamin": "jenis_kelamin",
-  Alamat: "alamat",
-  "Nomor Telepon": "no_telp",
-  "Status Tempat Tinggal": "status_tempat_tinggal",
-  "Jumlah Saudara Kandung": "jumlah_anggota_keluarga",
-  "Status Pekerjaan Ayah": "is_ayah_bekerja",
-  "Nama Ayah": "nama_ayah",
-  "Jenis Pekerjaan Ayah": "jenis_pekerjaan_ayah",
-  "Pendapatan Ayah Perbulan": "pendapatan_perbulan_ayah",
-  "Status Pekerjaan Ibu": "is_ibu_bekerja",
-  "Nama Ibu": "nama_ibu",
-  "Jenis Pekerjaan Ibu": "jenis_pekerjaan_ibu",
-  "Pendapatan Ibu Perbulan": "pendapatan_perbulan_ibu",
+  nisn: "nisn",
+  "nomor induk sekolah": "no_induk_sekolah",
+  "tingkat kelas": "tingkat_kelas",
+  username: "username",
+  password: "password",
+  "nama siswa": "nama",
+  "tempat lahir": "tempat_lahir",
+  "tanggal lahir": "tanggal_lahir",
+  "jenis kelamin": "jenis_kelamin",
+  alamat: "alamat",
+  "nomor telepon": "no_telp",
+  "status tempat tinggal": "status_tempat_tinggal",
+  "jumlah saudara kandung": "jumlah_anggota_keluarga",
+  "status pekerjaan ayah": "is_ayah_bekerja",
+  "nama ayah": "nama_ayah",
+  "jenis pekerjaan ayah": "jenis_pekerjaan_ayah",
+  "pendapatan ayah perbulan": "pendapatan_perbulan_ayah",
+  "status pekerjaan ibu": "is_ibu_bekerja",
+  "nama ibu": "nama_ibu",
+  "jenis pekerjaan ibu": "jenis_pekerjaan_ibu",
+  "pendapatan ibu perbulan": "pendapatan_perbulan_ibu",
 };

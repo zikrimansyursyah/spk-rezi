@@ -130,7 +130,7 @@ export default function ManajemenSiswa() {
     }
   };
   const handleDownloadTemplate = () => {
-    FileSaver.saveAs("/Template Import Data.xlsx", "Template Import Data Siswa.xlsx");
+    FileSaver.saveAs("/Template Import Data Siswa.xlsx", "Template Import Data Siswa.xlsx");
   };
 
   const handleUploadFile = (e) => {
@@ -170,51 +170,46 @@ export default function ManajemenSiswa() {
     for (const dt of data) {
       let temp = {};
       for (let i = 0; i < column.length; i++) {
-        if (column[i] === "Username") {
-          temp[column[i]] = dt[i].toLowerCase();
-        } else if (column[i] === "Tanggal Lahir") {
-          let regexDate = /^(0[1-9]|[1-2]\d|3[0-1])-(0[1-9]|1[0-2])-\d{4}$/;
-          if (!regexDate.test(dt[i])) {
-            return toast.current.show({ severity: "warn", summary: "Data Tidak Sesuai", sticky: true, detail: `Data Tanggal Lahir tidak sesuai panduan, pada data ${dt[0]} (${dt[2]})` });
-          } else {
-            temp[column[i]] = changeDateFormat(dt[i]);
-          }
+        let columnName = column[i].toString().toLowerCase();
+        temp[mapperRequest[columnName]] = dt[i];
+      }
+
+      const res = validateSchema(userImportSchema, temp);
+      if (res._error) {
+        return toast.current.show({ severity: "warn", summary: "Data Tidak Sesuai", sticky: true, detail: `${res.message} pada data ${temp["nama"]} (${temp["nisn"]})` });
+      }
+
+      const mapFormat = {
+        username: res["username"].toLowerCase(),
+        tanggal_lahir: changeDateFormat(res["tanggal_lahir"]),
+        is_ayah_bekerja: res["is_ayah_bekerja"].toLowerCase() === "bekerja",
+        is_ibu_bekerja: res["is_ibu_bekerja"].toLowerCase() === "bekerja",
+      };
+
+      for (const dt of Object.keys(res) || []) {
+        if (mapFormat.hasOwnProperty(dt)) {
+          temp[dt] = mapFormat[dt];
         } else {
-          temp[column[i]] = dt[i];
+          temp[dt] = res[dt];
         }
       }
       dataList.push(temp);
-    }
-
-    let payload = [];
-    for (const e of dataList) {
-      const res = validateSchema(userImportSchema, e);
-
-      if (res._error) {
-        return toast.current.show({ severity: "warn", summary: "Data Tidak Sesuai", sticky: true, detail: `${res.message} pada data ${e["Nama Siswa"]} (${e["NISN"]})` });
-      }
-
-      let temp = {};
-      for (const dt of Object.keys(res) || []) {
-        temp[mapperRequest[dt]] = ["is_ayah_bekerja", "is_ibu_bekerja"].includes(mapperRequest[dt]) ? res[dt] === "Bekerja" : res[dt];
-      }
-      payload.push(temp);
     }
 
     loading({ text: `Kami sedang menambah 0/${data.length} data`, visible: true });
 
     let successInsert = 0;
     let failedInsert = 0;
-    for (let i = 0; i < payload.length; i++) {
+    for (let i = 0; i < dataList.length; i++) {
       let isError = false;
-      await addSiswa(payload[i])
+      await addSiswa(dataList[i])
         .then((res) => {
           if (res.status !== 200) {
             failedInsert++;
             toast.current.show({
               severity: "warn",
               summary: "Gagal menambah data",
-              detail: `${res.message}, pada data ${payload[i].nama} (${payload[i].nisn})`,
+              detail: `${res.message}, pada data ${dataList[i].nama} (${dataList[i].nisn})`,
               sticky: true,
             });
           } else {
@@ -239,7 +234,7 @@ export default function ManajemenSiswa() {
         break;
       }
 
-      if (payload.length === i + 1) {
+      if (dataList.length === i + 1) {
         loading({ text: null, visible: false });
         setSuccessAdd(successInsert);
         setFailedAdd(failedInsert);
