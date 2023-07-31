@@ -33,6 +33,10 @@ export const getDropdownSiswa = async (tingkat_kelas) => {
   return await httpCall("POST", API.USERS_DROPDOWN_SISWA, { tingkat_kelas });
 };
 
+export const getIdSiswaByNIS = async (nis) => {
+  return await httpCall("POST", API.USERS_GET_ID_SISWA, { nis });
+};
+
 export const getTotalSiswa = async () => {
   return await httpCall("GET", API.USERS_TOTAL_SISWA);
 };

@@ -57,6 +57,7 @@ async function viewDataPrestasi(req, res) {
       },
       limit: rows,
       offset: first,
+      order: [["ranking", "asc"]],
     });
 
     return res.status(200).json({ status: 200, message: "Berhasil Melihat data Prestasi", data, count });

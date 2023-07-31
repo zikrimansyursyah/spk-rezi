@@ -11,6 +11,7 @@ export const USERS_ADD_USER = "/api/user/add-user";
 export const USERS_DELETE_USER = "/api/user/delete-user";
 export const USERS_DROPDOWN_SISWA = "/api/user/get-dropdown-siswa";
 export const USERS_TOTAL_SISWA = "/api/user/total-siswa";
+export const USERS_GET_ID_SISWA = "/api/user/get-id-by-nis";
 
 // ABSENSI
 export const ABSENSI_TAMBAH = "/api/absensi/add-absen";
@@ -32,7 +33,7 @@ export const TABLE_PENILAIAN = [
   { keterangan: "Sedang", nilai: 2 },
   { keterangan: "Tinggi", nilai: 3 },
   { keterangan: "Sangat Tinggi", nilai: 4 },
-]
+];
 
 // API RESPONSE
 export const RES_METHOD_NOT_ALLOWED = { status: 405, message: "Method Not Allowed" };

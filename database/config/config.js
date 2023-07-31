@@ -4,11 +4,11 @@ const { DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_DIALECT, DB_HOST_PROD, DB_USER_PR
 
 module.exports = {
   development: {
-    username: DB_USER,
-    password: DB_PASS,
-    database: DB_NAME,
-    host: DB_HOST,
-    dialect: DB_DIALECT,
+    username: DB_USER_PROD,
+    password: DB_PASS_PROD,
+    database: DB_NAME_PROD,
+    host: DB_HOST_PROD,
+    dialect: DB_DIALECT_PROD,
     define: {
       timestamps: false,
     },

@@ -18,3 +18,15 @@ export const viewAbsensiSchema = yup.object().shape({
   first: yup.number().required(),
   rows: yup.number().required(),
 });
+
+export const mapperRequestAbsensi = {
+  "nomor induk siswa": "nomor_induk_siswa",
+  nama: "nama",
+  bulan: "bulan",
+  tahun: "tahun",
+  "jumlah pertemuan": "jumlah_pertemuan",
+  hadir: "hadir",
+  izin: "izin",
+  sakit: "sakit",
+  alfa: "alfa",
+};

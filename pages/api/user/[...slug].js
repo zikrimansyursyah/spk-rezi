@@ -64,6 +64,26 @@ async function getName(req, res) {
   }
 }
 
+async function getIdByNIS(req, res) {
+  if (req.method.toUpperCase() !== "POST") {
+    return res.status(RES_METHOD_NOT_ALLOWED.status).json(RES_METHOD_NOT_ALLOWED);
+  }
+
+  const { nis } = req.body;
+
+  try {
+    const user = await Users.findOne({ where: { no_induk_sekolah: nis }, attributes: ["id"] });
+
+    if (user === null) {
+      return res.status(404).json({ status: 404, message: "User Not Found" });
+    }
+
+    return res.status(200).json({ status: 200, message: "Success", id_siswa: user.id });
+  } catch (error) {
+    return res.status(RES_INTERNAL_SERVER_ERROR.status).json(RES_INTERNAL_SERVER_ERROR);
+  }
+}
+
 async function getDetailSiswa(req, res) {
   if (req.method.toUpperCase() !== "POST") {
     return res.status(RES_METHOD_NOT_ALLOWED.status).json(RES_METHOD_NOT_ALLOWED);
@@ -253,6 +273,7 @@ export default async function handler(req, res) {
     "delete-user": deleteSiswa,
     "get-dropdown-siswa": getDropdownSiswa,
     "total-siswa": getCountSiswa,
+    "get-id-by-nis": getIdByNIS,
   };
 
   if (routes[api]) {
