@@ -642,9 +642,9 @@ export default function Prestasi() {
           </button>
         </div>
         <small>
-          <span className="text-red-500">*</span> penambahan data absensi menggunakan fitur import harus sesuai dengan template yang telah disediakan
+          <span className="text-red-500">*</span> penambahan data prestasi menggunakan fitur import harus sesuai dengan template yang telah disediakan
           <span onClick={handleDownloadTemplate} className="ml-1 cursor-pointer underline">
-            Unduh file template Import Absen Siswa
+            Unduh file template Import Prestasi Siswa
           </span>
         </small>
       </Dialog>
